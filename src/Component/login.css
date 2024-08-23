@@ -1,0 +1,182 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e0f7fa; /* Light pale blue background */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+/* App.css */
+.logo {
+    width: 150px; /* Adjust width as needed */
+    height: auto;
+  }
+  
+  
+
+.login-container {
+    margin-top: 5rem;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    background-color: #cfe1eb;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border: 2px solid #0056b3;
+    
+}
+
+.login-header {
+    
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 20px;
+    background: white;
+}
+
+.hospital-logo {
+    height: 50px;
+    margin-right: 10px;
+}
+
+.hospital-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-left: 15px;
+}
+
+.login-box {
+    text-align: left;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.login-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: #0056b3;
+}
+
+.forgot-password {
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    color: #007bff;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+.login-footer {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.login-footer a {
+    color: #007bff;
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+}
+
+.help-button {
+    margin-top: 20px;
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.help-button:hover {
+    text-decoration: underline;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  .navbar {
+    display: flex;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    top: 0;
+    position: fixed;
+    min-width: 23rem !important;
+    left: 0;
+    width: 100%;
+    background-color: white;
+  }
+  
+  .logo img {
+    height: 40px; /* Adjust as per the logo size */
+  }
+  
+  .nav-links {
+    display: flex;
+    list-style: none;
+  }
+  
+  .nav-links li {
+    margin: 0 15px;
+  }
+  
+  .nav-links li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .nav-links li a:hover {
+    color: #007bff; /* Change color on hover */
+  }
+  
+  .login-btn a {
+    text-decoration: none;
+    color: #333;
+    font-size: 20px;
+    padding: 5px 10px;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+  }
+  
+  .login-btn a:hover {
+    background-color: #007bff;
+    color: white;
+  }
+  
