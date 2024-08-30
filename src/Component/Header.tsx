@@ -21,7 +21,7 @@ const Headers = () => {
           <a href="/login">Login</a>
         </div>
         <div className="login-btn">
-          <a href="/signUp">Sign Up</a>
+          <a href="/register">Sign Up</a>
         </div>
       </nav>
     )

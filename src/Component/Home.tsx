@@ -34,7 +34,7 @@ const Home: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState([]);
   const userName = useSelector((state: RootState) => state.user.userName);
   const [showLocation, setShowLocation] = useState(true);
-  const [hospDtlsByLoc, setHospDtlsByLoc] = useState<any>({});
+  const [hospDtlsByLoc, setHospDtlsByLoc] = useState<any>([]);
   const [spltNameList, setSpltNameList] = useState<any> ({})
   
   useEffect(() => {
@@ -61,17 +61,44 @@ const Home: React.FC = () => {
     console.log(e, "newVal")
   }
 
+useEffect(() => {
+  const fetchHospitalDtls = async () => {
+  try {
+    const response = await fetch('http://localhost:8082/hospital/hospitalDetails', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+        const errorMessage = await response.text(); // Use response.json() if server returns JSON
+        toast.error(errorMessage);
+    }
+    const value = await response.json()
+    console.log(value,"log")
+    setHospDtlsByLoc(value);
+
+    // const data = await response.json();
+    // console.log(data);
+  } catch (error) {
+    console.error('Error making POST request:', error);
+  }
+  getSplDtlsByLoc();
+}
+fetchHospitalDtls()
+},[])
+
   const handleSearchLocation = async (e: any) => {
     if(selectedLocation.length == 0){
       toast.warning("Please select location")
     } else{
       try {
         const response = await fetch('http://localhost:8082/hospital/hospitalDetails', {
-          method: 'POST',
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(selectedLocation),
         });
     
         if (!response.ok) {
@@ -92,27 +119,27 @@ const Home: React.FC = () => {
   }
 
   const getSplDtlsByLoc = async () => {
-    try {
-      const response = await fetch('http://localhost:8082/hospital/specialistName', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(selectedLocation),
-      });
+    // try {
+    //   const response = await fetch('http://localhost:8082/hospital/specialistName', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(selectedLocation),
+    //   });
   
-      if (!response.ok) {
-          const errorMessage = await response.text(); // Use response.json() if server returns JSON
-          toast.error(errorMessage);
-      }
-      setSpltNameList( await response.json());
-      setShowLocation(false)
+    //   if (!response.ok) {
+    //       const errorMessage = await response.text(); // Use response.json() if server returns JSON
+    //       toast.error(errorMessage);
+    //   }
+    //   setSpltNameList( await response.json());
+    //   setShowLocation(false)
   
-      // const data = await response.json();
-      // console.log(data);
-    } catch (error) {
-      console.error('Error making POST request:', error);
-    }
+    //   // const data = await response.json();
+    //   // console.log(data);
+    // } catch (error) {
+    //   console.error('Error making POST request:', error);
+    // }
   }
 
   return (
@@ -122,7 +149,7 @@ const Home: React.FC = () => {
 
       
       <Headers />
-      {  showLocation ?  (
+      {/* {  showLocation ?  (
       <Grid container xs={12} sx={containerStyle}>
         <Autocomplete
           multiple
@@ -142,10 +169,10 @@ const Home: React.FC = () => {
         />
         <Button onClick={handleSearchLocation} sx={{background: "#067492 !important", color: "white"}}><ArrowForwardIcon /></Button>
       </Grid>
-      ) : (
-          <HospitalDetails hospDtlsByLoc={hospDtlsByLoc} spltNameList={spltNameList} locationList={selectedLocation}/>
+      ) : ( */}
+          <HospitalDetails hospDtlsByLoc={hospDtlsByLoc} spltNameList={spltNameList} locationList={locationDetails}/>
         
-      )}
+      {/* )} */}
       </div>
       </div>
     </>

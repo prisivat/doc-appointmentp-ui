@@ -1,13 +1,13 @@
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { Button } from '@mui/material';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
 
 const BootstrapDialog = styled(Dialog)(({ theme:any }) => ({
     '& .MuiDialogContent-root': {
@@ -25,6 +25,7 @@ const BootstrapDialog = styled(Dialog)(({ theme:any }) => ({
   }
 const Model = ({opeModel, setOpeModel, hospitalDetails}: Props) => {
     const [open, setOpen] = React.useState(opeModel);
+    const hospitalNameMail =  hospitalDetails.replace(/ /g, '')
 
     const handleClickOpen = () => {
       setOpen(true);
@@ -69,9 +70,8 @@ return(
       </IconButton>
       <DialogContent dividers>
         <Typography gutterBottom>
-          Contact : 044 - 23143532 <br/>
-044-23139232
-Email: {hospitalDetails} @gmail.com
+          <div style = {{display: "flex"}}><PhoneInTalkIcon/>   Contact : 044 - 23143532,  044-23139232<br/></div>
+          <div style = {{display: "flex"}}> <MailOutlineIcon/>   Email: {hospitalNameMail}@gmail.com</div>
         </Typography>
       </DialogContent>
      </BootstrapDialog>

@@ -180,3 +180,53 @@ body {
     color: white;
   }
   
+  .date-picker {
+    background-color: #f7f7f9;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    min-width: 90%;
+  }
+  
+  .dates {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+  }
+  
+  .date-item {
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #e0e0e0;
+  }
+  
+  .date-item.selected {
+    background-color: #ff85a1;
+    color: white;
+  }
+  
+  .hidden-date {
+    visibility: hidden;
+    width: 60px; /* Adjust this value based on your design */
+  }
+  
+  .time-slots button {
+    margin: 5px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #e0e0e0;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .book-appointment {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #3a86ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  

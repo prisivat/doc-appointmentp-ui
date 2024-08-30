@@ -10,50 +10,53 @@ import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
 import { toast } from 'react-toastify';
 import Model from './Model';
+import BookingDetails from './BookingDetails';
+import { useNavigate, } from "react-router-dom";
+import { hospitalDetails, userDetails } from "../userSlice"
+import { useAppSelector } from '../reduxHooks';
+import { useSelector, useDispatch } from 'react-redux';
+import { Avatar } from '@mui/material';
+
+
 
 
 interface Prop {
-    hospDtlsByLoc: any;
-    spltNameList: any;
-    locationList: any;
+  hospDtlsByLoc: any;
+  spltNameList: any;
+  locationList: any;
 }
 export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: Prop) => {
-    console.log(hospDtlsByLoc, "hospDtlsByLoc")
-    console.log(spltNameList, "spltNameList")
-    const [selectedLocation, setSelectedLocation] = useState<any>([]);
-    const [showSpecalistFilter, setShowSpecalistFilter] = useState(false)
-    const [specalistList, setSpecalistList] = useState([])
-    const [selectedSpecalist, setSelectedSpecalist] = useState<any>([])
-    // const [selectedHospitals, setSelectedHospitals] = useState<string[]>([]);
-    const [selectedHospitals, setSelectedHospitals] = useState("");
-    const[filterBy, setFilterBy] = useState({location: "", specalist:""});
-    const[localHospitalDetails, setLocalHospitalDetails] = useState(hospDtlsByLoc);
-    const[openModel, setOpenModel] = useState(false);
-    const[hospName, setHospName] = useState("");
+  const [locationSelected, setLocationSelected] = useState<any>("");
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [localHospitalDetails, setLocalHospitalDetails] = useState(hospDtlsByLoc);
+  const [specalistFilterList, setSpecalistFilterList] = useState([]);
+  const [openModel, setOpenModel] = useState(false);
+  const [hospName, setHospName] = useState("");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-    useEffect(() => {
-        setLocalHospitalDetails(hospDtlsByLoc)
-    },[hospDtlsByLoc])
 
-  const handleChange = (event: any) => {
-    const value = event.target.value ;
-    setSelectedHospitals(value);
-  };
 
-//   const handleCheckChange = (event: React.ChangeEvent<HTMLInputElement>, hospital: string) => {
-//     const isChecked = event.target.checked;
-//     setSelectedHospitals((prev) =>
-//       isChecked ? [...prev, hospital] : prev.filter((item) => item !== hospital)
-//     );
-//   };
+  useEffect(() => {
+    setLocalHospitalDetails(hospDtlsByLoc)
+  }, [hospDtlsByLoc])
+
 
   async function handleFilter(): Promise<void> {
-    console.log(selectedHospitals);
-    var val = selectedHospitals?.split(",");
-    var value = hospDtlsByLoc;
-    setLocalHospitalDetails(filterData(value, val[1], val[0]))
-    console.log(localHospitalDetails, "Fitered")
+    if (selectedLocation == "") {
+      setLocalHospitalDetails(hospDtlsByLoc)
+    } else {
+      console.log(selectedLocation);
+      var val = selectedLocation?.split(",");
+      var value = hospDtlsByLoc;
+      setLocalHospitalDetails(filterData(value, val[1], val[0]))
+    }
   }
+  const handleReset = () => {
+    setSelectedLocation("")
+    setLocalHospitalDetails(hospDtlsByLoc)
+  }
+
 
   const filterData = (data: any, location: string, specialization: string) => {
     return Object.keys(data)
@@ -71,7 +74,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
           }
           return null;
         }).filter((hospital: any) => hospital !== null);
-  
+
         if (filteredHospitals.length > 0) {
           result[loc] = filteredHospitals;
         }
@@ -79,102 +82,203 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
       }, {});
   };
 
-    function handleLocationSelection(newValue: any): void {
-        setSelectedLocation(newValue)
-        setShowSpecalistFilter(true);
-        setSpecalistList(spltNameList[newValue]);
-    }
 
-
-
-    function handleSpecalistSelection(newValue: any[]): void {
-        setSelectedSpecalist(newValue)
-    }
 
   function handleContactDetails(val: any): void {
     setOpenModel(true);
     setHospName(val);
-    
+
   }
 
-    return (
-        <Grid container xs={12} sx={{
-            minWidth: "95rem !important", display: "flex", marginLeft: "5% !important",
-            justifyContent: "space-around", flexWrap: "nowrap", marginTop: "8rem",
-        }} spacing={2}>
-            <Grid item xs={6} sx={{ maxHeight: "30rem", overflowY: "scroll" }} >
-                {Object.keys(localHospitalDetails).map((city: any, cityIndex) => (
-                    <div key={cityIndex}>
-                        {localHospitalDetails[city].map((hospital: any, hospitalIndex: number) => (
-                            <div key={hospitalIndex}>
-                                
+  useEffect (() => {
+    var location = locationSelected;
+    const fetchFilterValues = async () => {
+      try {
+        const response = await fetch(`http://localhost:8082/hospital/filterDtls/${location}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+        const data = await response.json();
+        setSpecalistFilterList(data);
+      } catch (error) {
+        console.error('Error making POST request:', error);
+      }
+    }
+    if(locationSelected != ""){
+    fetchFilterValues();
+    }
 
-                            <Card sx={{ margin: "10px" }}>
+  },[locationSelected])
 
-                                <CardContent>
-                                    <Grid container xs={12}>
-                                        <Grid xs={6}>
+  function handleBookAppointment(docName: any, time: any, hospitalName: any, location: any): void {
+    dispatch(hospitalDetails({
+      docName: docName,
+      time: time,
+      hospitalName: hospitalName,
+      location: location
+    }));
+    navigate("/bookAppointment")
+  }
 
-                                            <Typography sx={{ fontSize: "1.5rem !important", color: "rgb(7, 153, 193)" }} color="text.primary" gutterBottom>
-                                                <b>{hospital.name}</b>
-                                            </Typography>
-                                            <Grid sx={{ display: "flex", flexWrap: "wrap", justifyContent: "space-evenly" }}>
-                                                {hospital?.specalist && hospital.specalist.map((specalistVal: any) => (
+  const handleLocationChange =(e:any) => {
+    setLocationSelected(e.target.value)
+  }
 
-                                                    <Typography sx={{
-                                                        fontSize: ".8rem", marginTop: "2px", border: "1px solid #3d3d81",
-                                                        borderRadius: "2px", background: "#e6f9ff", padding: "5px"
+  return (
+    <Grid container xs={12} sx={{
+      minWidth: "95rem !important", display: "flex", marginLeft: "5% !important",
+      justifyContent: "space-around", flexWrap: "nowrap", marginTop: "8rem",
+    }} spacing={2}>
+      <Grid item xs={6} sx={{ maxHeight: "30rem", overflowY: "scroll" }} >
+        {localHospitalDetails!=undefined && localHospitalDetails.length != 0 && localHospitalDetails?.map((city: any) => (
+          <div >
+            {city?.hospitalDetails?.map((hospital: any, hospitalIndex: number) => (
+              <div >
+                <Typography sx={{ fontSize: "1.5rem !important", color: "black" }} color="text.primary" gutterBottom>
+                  <b>{hospital?.name}</b>
+                </Typography>
+                {hospital?.specalist && hospital.specalist?.map((specalistVal: any) => (
+                            <div>
+                              {specalistVal?.doctorsList[0]?.docNameAndAvblTime.map((docName: any) => (
+
+                <Card sx={{ margin: "10px" }}>
+
+                  <CardContent>
+                    <Grid container xs={12}>
+                      <Grid xs={6}>
+                        <Grid xs={12} sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start"}}>
+                        <Avatar/>
+                                  <span style={{marginLeft: "1rem"}}>{docName?.docName} </span>
+                        </Grid>
+                        <div style={{fontSize: "14px" , color: "black", margin: "1rem", display: "flex", alignItems: "center", justifyContent: "space-around" }}>  
+                          <Typography sx={{
+                                                        fontSize: ".8rem", border: "1px solid #3d3d81",
+                                                        borderRadius: "2px", background: "#e6f9ff", padding: "5px", maxWidth: "6rem",  
                                                     }} color="text.secondary">
                                                         {specalistVal.spclName}
                                                     </Typography>
 
-                                                ))}
-                                            </Grid>
+                        <div style={{ fontSize: "14px", color: "black", }}><b>Location: </b>{city.location}</div>
+                        </div>
+                        </Grid>
+                      <Grid xs={6} sx={{ borderLeft: "2px solid black", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ marginBottom: "5px" }}>Monday to Sunday (09:00 To 20:00) </div>
+                        <Button onClick={() => handleContactDetails(hospital.name)} sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Contact Hospital</Button>
+                        <Button onClick={() => handleBookAppointment(docName?.docName, docName?.availableTime, hospital?.name, city)} sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Book Appointment</Button>
+                        {openModel && (
+                          <Model hospitalDetails={hospName} opeModel={openModel} setOpeModel={setOpenModel} />
+                        )}
 
-                                            <div style={{ fontSize: "14px", color: "black", margin: "1rem" }}><b>Location: </b>{city}</div>
-                                        </Grid>
-                                        <Grid xs={6} sx={{ borderLeft: "2px solid black", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                                            <div style={{ marginBottom: "5px" }}>Monday to Sunday (09:00 To 20:00) </div>
-                                            <Button onClick={() => handleContactDetails(hospital.name)} sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Contact Hospital</Button>
-                                            <Button sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Book Appointment</Button>
-                                            {openModel && (
-                                              <Model hospitalDetails={hospName} opeModel={openModel} setOpeModel={setOpenModel}/>
-                                              )}
-                                        </Grid>
-                                    </Grid>
-                                </CardContent>
-                            </Card>
-                            </div>
-                        ))}
-                    </div>
-              
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
                 ))}
-            </Grid>
-            <Grid item xs={4} sx={{ marginRight: "5rem", marginBottom: "5rem" }}>
-                <div style={{ background: "white", height: "100%", width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <FormControl sx={{ m: 1, minWidth: 340 }}>
-      <InputLabel htmlFor="grouped-native-select">Select Specalist</InputLabel>
-      <Select
-        native
-        value={selectedHospitals}
-        onChange={(e:any) => {handleChange(e)}}
-        id="grouped-native-select"
-        label="Grouping"
-        sx={{maxWidth: 340}}
-      >
-        <option aria-label="None" value="" />
-        {Object.keys(spltNameList).map((city: any, cityIndex: any) => (
-          <optgroup label={city} key={cityIndex}>
-            {spltNameList[city].map((hospital: any, hospitalIndex: number) => (
-              <option key={hospitalIndex} value={hospital + "," + city}>
-                {hospital}
-              </option>
+               
+              </div>
             ))}
-          </optgroup>
-        ))}
-      </Select>
-    </FormControl>              
-      {/* 
+              </div>
+            ))}
+          </div>
+
+        ))} 
+      </Grid>
+      <Grid item xs={4} sx={{ marginRight: "5rem", marginBottom: "5rem" }}>
+        <div style={{ background: "white", height: "100%", width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          Location: 
+
+          <FormControl sx={{ m: 1, minWidth: 120 }}>
+        <Select
+          value={locationSelected}
+          onChange={handleLocationChange}
+          inputProps={{ 'aria-label': 'Without label' }}
+        >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          {locationList?.map((val: any) => (
+          <MenuItem value={val}>{val}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      {locationSelected != "" && (
+       
+            <><div>Cost :
+              <FormControl sx={{ m: 1, minWidth: 120 }}>
+                <Select
+                  value={locationSelected}
+                  onChange={handleFilter}
+                  inputProps={{ 'aria-label': 'Without label' }}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {locationList?.map((val: any) => (
+                    <MenuItem value={val}>{val}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+            <div>Hospital Name :
+              <FormControl sx={{ m: 1, minWidth: 120 }}>
+                <Select
+                  value={locationSelected}
+                  onChange={handleFilter}
+                  inputProps={{ 'aria-label': 'Without label' }}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {locationList?.map((val: any) => (
+                    <MenuItem value={val}>{val}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div><div>Specalist :
+                <FormControl sx={{ m: 1, minWidth: 120 }}>
+                  <Select
+                    value={locationSelected}
+                    onChange={handleFilter}
+                    inputProps={{ 'aria-label': 'Without label' }}
+                  >
+                    <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem>
+                    {locationList?.map((val: any) => (
+                      <MenuItem value={val}>{val}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </div></>
+      )}
+
+
+          {/* <FormControl sx={{ m: 1, minWidth: 340 }}>
+            <InputLabel htmlFor="grouped-native-select">Select Specalist</InputLabel>
+            <Select
+              native
+              value={selectedLocation}
+              onChange={(e: any) => { handleLocationFilterChange(e) }}
+              id="grouped-native-select"
+              label="Grouping"
+              sx={{ maxWidth: 340 }}
+            >
+              <option aria-label="None" value="" >None</option>
+              {Object.keys(spltNameList).map((city: any, cityIndex: any) => (
+                <optgroup label={city} key={cityIndex}>
+                  {spltNameList[city].map((hospital: any, hospitalIndex: number) => (
+                    <option key={hospitalIndex} value={hospital + "," + city}>
+                      {hospital}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </Select>
+          </FormControl> */}
+          {/* 
  
 <FormControl sx={{ m: 1, minWidth: 340 }}>
       <InputLabel id="grouped-multi-select-label">Select Specalist</InputLabel>
@@ -182,7 +286,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
         labelId="grouped-multi-select-label"
         id="grouped-multi-select"
         multiple
-        value={selectedHospitals}
+        value={selectedLocation}
         onChange={(e:any) => {handleChange(e)}}
         sx={{maxWidth: 340}}
         renderValue={(selected) => (selected as string[]).join(', ')}
@@ -193,7 +297,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
             {spltNameList[city].map((hospital: string, hospitalIndex: number) => (
               <MenuItem key={hospitalIndex} value={hospital}>
                 <Checkbox
-                  checked={selectedHospitals.indexOf(hospital) > -1}
+                  checked={selectedLocation.indexOf(hospital) > -1}
                   onChange={(event) => handleCheckChange(event, hospital)}
                 />
                 <ListItemText primary={hospital} />
@@ -203,10 +307,12 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
         ))}
       </Select>
     </FormControl>  */}
-                    <Button sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} onClick={handleFilter} >FILTER</Button>
-                </div>
-            </Grid>
+          <Button sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} onClick={handleReset} >RESET</Button>
+          <Button sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} onClick={handleFilter} >FILTER</Button>
+        </div>
+      </Grid>
 
-        </Grid>
-    )
+    </Grid>
+  )
 }
+

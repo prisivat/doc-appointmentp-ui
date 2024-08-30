@@ -9,6 +9,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSelector } from 'react-redux';
 import { RootState } from './store';
+import BookingDetails from './Component/BookingDetails';
 
 
 
@@ -27,15 +28,20 @@ function App() {
         element: <Login />,
       },
       {
-        path: "/signUp",
+        path: "/register",
         element: <SignUp />
+      },
+      {
+        path: "/bookAppointment",
+        element: <BookingDetails/>
       }
     ]
   )
   const userName = useSelector((state: RootState) => state.user.userName);
-  
+
 
  console.log(userName, "App")
+
   return (
     <>
       <RouterProvider router={router} />

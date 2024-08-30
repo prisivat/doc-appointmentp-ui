@@ -1,15 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface UserState {
-  userName: string;
-  password: string;
-  namesList: string[];
+  userName?: string;
+  docName?: string,
+  time?: string,
+  hospitalName?: string,
+  location?: string
 }
 
 const initialState: UserState = {
   userName: '',
-  password: '',
-  namesList: [],
+  docName: "",
+  time: "",
+  hospitalName: "",
+  location: ''
 };
 
 export const userSlice = createSlice({
@@ -18,11 +22,15 @@ export const userSlice = createSlice({
     reducers: {
         userDetails: (state, action: PayloadAction<UserState>) => {
             state.userName = action.payload.userName;
-            state.namesList = action.payload.namesList;
-            state.password = action.payload.password;
+            },    
+        hospitalDetails:  (state, action: PayloadAction<UserState>) => {
+          state.hospitalName = action.payload.hospitalName;
+          state.time = action.payload.time;
+          state.docName = action.payload.docName;
+          state.location = action.payload.location;
         }
     }
 });
 
-export const { userDetails } = userSlice.actions;
+export const { userDetails, hospitalDetails} = userSlice.actions;
 export default userSlice.reducer;
