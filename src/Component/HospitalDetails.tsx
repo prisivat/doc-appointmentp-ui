@@ -16,6 +16,8 @@ import { hospitalDetails, userDetails } from "../userSlice"
 import { useAppSelector } from '../reduxHooks';
 import { useSelector, useDispatch } from 'react-redux';
 import { Avatar } from '@mui/material';
+import { Telegram } from '@mui/icons-material';
+
 
 
 
@@ -29,13 +31,18 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
   const [locationSelected, setLocationSelected] = useState<any>("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [localHospitalDetails, setLocalHospitalDetails] = useState(hospDtlsByLoc);
-  const [specalistFilterList, setSpecalistFilterList] = useState([]);
+  const [hospitalNameFilterList, setHospitalNameFilterList] = useState([]);
+  const [specalistFilterList, setSpecialistFilterList] = useState([]);
   const [openModel, setOpenModel] = useState(false);
   const [hospName, setHospName] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [costFilter, setCostFilter] = useState(10);
+  const [filterValues, setFilterValues] = useState({hospitalName: [], cost: "5000", specialist:[], location:""})
 
-
+  const handleSliderChange = (e: any) => {
+    setCostFilter(e.target.value);
+  };
 
   useEffect(() => {
     setLocalHospitalDetails(hospDtlsByLoc)
@@ -43,18 +50,45 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
 
 
   async function handleFilter(): Promise<void> {
-    if (selectedLocation == "") {
-      setLocalHospitalDetails(hospDtlsByLoc)
-    } else {
-      console.log(selectedLocation);
-      var val = selectedLocation?.split(",");
-      var value = hospDtlsByLoc;
-      setLocalHospitalDetails(filterData(value, val[1], val[0]))
+    if(locationSelected == ""){
+      toast.error("Please select Location");
+    } else{
+      var final:any = {};
+      final.cost = parseInt(filterValues.cost)  
+      final.hospitalName = filterValues.hospitalName
+      final.location = locationSelected
+      final.specialist = filterValues.specialist
+
+      try {
+        const response = await fetch('http://localhost:8082/hospital/filteredDtls', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(final),
+        });
+    
+        if (!response.ok) {
+            const errorMessage = await response.text(); // Use response.json() if server returns JSON
+            toast.error(errorMessage);
+        } else{
+          var val = await response.json()
+            setLocalHospitalDetails(val)
+        }
+    
+        // const data = await response.json();
+        // console.log(data);
+      } catch (error) {
+        console.error('Error making POST request:', error);
+      }
+      
     }
+   
   }
   const handleReset = () => {
     setSelectedLocation("")
     setLocalHospitalDetails(hospDtlsByLoc)
+    setFilterValues({hospitalName: [], cost: "5000", specialist:[], location:""})
   }
 
 
@@ -100,8 +134,15 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
         'Content-Type': 'application/json',
       },
     });
+    if (!response.ok) {
+      const errorMessage = await response.text(); // Use response.json() if server returns JSON
+      setLocationSelected("");
+      toast.error("We are working on this location. Please try other locations");
+  }else{
         const data = await response.json();
-        setSpecalistFilterList(data);
+        setHospitalNameFilterList(data?.hospitalName);
+        setSpecialistFilterList(data?.specialist);
+  }
       } catch (error) {
         console.error('Error making POST request:', error);
       }
@@ -202,57 +243,73 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
           <MenuItem value={val}>{val}</MenuItem>
           ))}
         </Select>
+        
       </FormControl>
 
       {locationSelected != "" && (
        
-            <><div>Cost :
-              <FormControl sx={{ m: 1, minWidth: 120 }}>
-                <Select
-                  value={locationSelected}
-                  onChange={handleFilter}
-                  inputProps={{ 'aria-label': 'Without label' }}
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  {locationList?.map((val: any) => (
-                    <MenuItem value={val}>{val}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </div>
+            <>
+
             <div>Hospital Name :
-              <FormControl sx={{ m: 1, minWidth: 120 }}>
-                <Select
-                  value={locationSelected}
-                  onChange={handleFilter}
-                  inputProps={{ 'aria-label': 'Without label' }}
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  {locationList?.map((val: any) => (
-                    <MenuItem value={val}>{val}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+            <Autocomplete
+  multiple
+  id="combo-box-demo"
+  options={hospitalNameFilterList}
+  getOptionLabel={(option: any) => option}
+  sx={{ width: 300, background: "white" }}
+  value={filterValues.hospitalName}
+  onChange={(e, value:any) => {
+    setFilterValues((val) => ({
+      ...val,
+      hospitalName: value 
+    }));
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Select hospitals"
+      variant="outlined"
+    />
+  )}
+/>
             </div><div>Specalist :
-                <FormControl sx={{ m: 1, minWidth: 120 }}>
-                  <Select
-                    value={locationSelected}
-                    onChange={handleFilter}
-                    inputProps={{ 'aria-label': 'Without label' }}
-                  >
-                    <MenuItem value="">
-                      <em>None</em>
-                    </MenuItem>
-                    {locationList?.map((val: any) => (
-                      <MenuItem value={val}>{val}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </div></>
+            <Autocomplete
+          multiple
+          id="combo-box-demo"
+          options={specalistFilterList}
+          getOptionLabel={(option: any) => option}
+          sx={{ width: 300, background: "white" }}
+          value={filterValues.specialist}
+          onChange={(e : any, value: any) => {
+            setFilterValues((val) => ({
+              ...val,
+              specialist: value
+            }));
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Select locations"
+              variant="outlined"
+            />
+          )}
+        />
+              </div>
+              <div>Cost :
+        <input
+        type="range"
+        min="1000"
+        max="5000"
+        step="500"
+        value={filterValues.cost}
+        onChange={(e) => {
+          setFilterValues((val) => ({
+            ...val,
+            cost: e.target.value
+          }));
+        }}
+      /> {filterValues.cost}
+            </div></>
       )}
 
 
@@ -307,7 +364,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
         ))}
       </Select>
     </FormControl>  */}
-          <Button sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} onClick={handleReset} >RESET</Button>
+          <Button sx={{ background: "#067492 !important", color: "white", marginBottom: "5px", marginTop: "2rem" }} onClick={handleReset} >RESET</Button>
           <Button sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} onClick={handleFilter} >FILTER</Button>
         </div>
       </Grid>
