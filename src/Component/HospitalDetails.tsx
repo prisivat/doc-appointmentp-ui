@@ -52,7 +52,9 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
   async function handleFilter(): Promise<void> {
     if(locationSelected == ""){
       toast.error("Please select Location");
-    } else{
+    } else if((filterValues.specialist.length == 0 ||  filterValues.hospitalName.length == 0 ) && locationSelected != ""){
+      toast.error("Please Select both Speaclist and Hospital Name")
+    }else {
       var final:any = {};
       final.cost = parseInt(filterValues.cost)  
       final.hospitalName = filterValues.hospitalName
@@ -73,13 +75,13 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
             toast.error(errorMessage);
         } else{
           var val = await response.json()
-            setLocalHospitalDetails(val)
+            setLocalHospitalDetails([val])
         }
     
         // const data = await response.json();
         // console.log(data);
       } catch (error) {
-        console.error('Error making POST request:', error);
+        toast.error('Error making POST request:');
       }
       
     }
@@ -144,7 +146,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
         setSpecialistFilterList(data?.specialist);
   }
       } catch (error) {
-        console.error('Error making POST request:', error);
+        toast.error('Error making POST request:');
       }
     }
     if(locationSelected != ""){
@@ -153,12 +155,13 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
 
   },[locationSelected])
 
-  function handleBookAppointment(docName: any, time: any, hospitalName: any, location: any): void {
+  function handleBookAppointment(docName: any, time: any, hospitalName: any, location: any, specalist:any): void {
     dispatch(hospitalDetails({
       docName: docName,
       time: time,
       hospitalName: hospitalName,
-      location: location
+      location: location,
+      specalist:specalist
     }));
     navigate("/bookAppointment")
   }
@@ -173,7 +176,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
       justifyContent: "space-around", flexWrap: "nowrap", marginTop: "8rem",
     }} spacing={2}>
       <Grid item xs={6} sx={{ maxHeight: "30rem", overflowY: "scroll" }} >
-        {localHospitalDetails!=undefined && localHospitalDetails.length != 0 && localHospitalDetails?.map((city: any) => (
+        {localHospitalDetails!=undefined && localHospitalDetails?.map((city: any) => (
           <div >
             {city?.hospitalDetails?.map((hospital: any, hospitalIndex: number) => (
               <div >
@@ -207,7 +210,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
                       <Grid xs={6} sx={{ borderLeft: "2px solid black", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                         <div style={{ marginBottom: "5px" }}>Monday to Sunday (09:00 To 20:00) </div>
                         <Button onClick={() => handleContactDetails(hospital.name)} sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Contact Hospital</Button>
-                        <Button onClick={() => handleBookAppointment(docName?.docName, docName?.availableTime, hospital?.name, city)} sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Book Appointment</Button>
+                        <Button onClick={() => handleBookAppointment(docName?.docName, docName?.availableTime, hospital?.name, city?.location, specalistVal.spclName)} sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Book Appointment</Button>
                         {openModel && (
                           <Model hospitalDetails={hospName} opeModel={openModel} setOpeModel={setOpenModel} />
                         )}

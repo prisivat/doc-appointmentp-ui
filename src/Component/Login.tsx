@@ -5,7 +5,7 @@ import { Button, TextField } from '@mui/material';
 import { toast } from 'react-toastify';
 import Headers from './Header';
 import { useSelector, useDispatch } from 'react-redux';
-import {userDetails} from "../userSlice"
+import userSlice, {userDetails} from "../userSlice"
 import { useAppSelector } from '../reduxHooks';
 import { useNavigate } from "react-router-dom";
 
@@ -19,6 +19,12 @@ interface LoginFormState {
 
 const LoginPage: React.FC = () => {
     const [formData, setFormData] = useState<LoginFormState>({ username: '', password: '', otp: "" });
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
+    const [showForgotUserName, setShowForgotUserName] = useState(false);
+    const [showToken, setShowToken] = useState(false)
+    const [forgotPassword, setForgotPassword] = useState({email: "", userName: ""})
+    const[forgotUserEmail, setForgotUserEmail] = useState("");
+    const [resetPassword, setResetPassword] = useState({token: "", password: "", confirmPassword:""})
     const dispatch = useDispatch();
     const [enterOTP, setEnterOTP] = useState(false);
 
@@ -52,7 +58,7 @@ const LoginPage: React.FC = () => {
             // const data = await response.json();
             // console.log(data);
           } catch (error) {
-            console.error('Error making POST request:', error);
+            toast.error('Error making POST request:');
           }
         }
         
@@ -68,7 +74,6 @@ const LoginPage: React.FC = () => {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         // Handle form submission (e.g., API call)
-        console.log('Form submitted:', formData);
     };
 
     const handleOptVerify = async (e: any) => {
@@ -103,25 +108,145 @@ const LoginPage: React.FC = () => {
             // const data = await response.json();
             // console.log(data);
           } catch (error) {
-            console.error('Error making POST request:', error);
+            toast.error('Error making POST request:');
           }
         }
     }
     const handleRegister = () =>{
         navigate("/register")
     }
+    
+    const handleForgotPasswordEmail = async () => {
+        try {
+            const response = await fetch('http://localhost:8082/api/patient/forgot-password', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(forgotPassword),
+            });
+        
+            if (!response.ok) {
+                const errorMessage = await response.text(); // Use response.json() if server returns JSON
+                toast.error(errorMessage);
+                // if(errorMessage == "OTP has Expired." ){
+                //     setEnterOTP(false)
+                // } else if(errorMessage == "OTP is Invalid."){
+                //     setFormData({ ...formData, otp: "" });
+                //     }
+            } else{
+                const message = await response.text(); // Use response.json() if server returns JSON
+                toast.success("Token sent to your email")
+                setShowToken(true);
+                setShowForgotPassword(false);
+                setShowForgotUserName(false);
+                var val = await response.json()
+                // navigate("/");
+            }
+        
+            // const data = await response.json();
+            // console.log(data);
+          } catch (error) {
+            toast.error('Error making POST request:');
+          }
 
+
+
+    }
+
+
+    const handleResetPassword =async () => {
+        if(resetPassword.confirmPassword == resetPassword.password){
+            const data = {token : resetPassword.token, newPassword: resetPassword.password}
+            try {
+                const response = await fetch('http://localhost:8082/api/patient/reset-password', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(data),
+                });
+            
+                if (!response.ok) {
+                    const errorMessage = await response.text(); // Use response.json() if server returns JSON
+                    toast.error(errorMessage);
+                    // if(errorMessage == "OTP has Expired." ){
+                    //     setEnterOTP(false)
+                    // } else if(errorMessage == "OTP is Invalid."){
+                    //     setFormData({ ...formData, otp: "" });
+                    //     }
+                } else{
+                    const message = await response.text(); // Use response.json() if server returns JSON
+                    toast.success("Password Reset Successfull")
+                    setShowToken(false);
+                    setShowForgotPassword(false);
+                    setShowForgotUserName(false);
+                    var val = await response.json()
+                    navigate("/login");
+                }
+            
+                // const data = await response.json();
+                // console.log(data);
+              } catch (error) {
+                toast.error('Error making POST request:');
+              }
+        } else{
+            toast.error("Password and Confirm Password are not same")
+        }
+    }
+
+
+    const handleForgotUserNameEmail = async () => {
+        const data = {"email": forgotUserEmail}
+        try {
+            const response = await fetch('http://localhost:8082/api/patient/forgot-username', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data),
+            });
+        
+            if (!response.ok) {
+                const errorMessage = await response.text(); // Use response.json() if server returns JSON
+                toast.error(errorMessage);
+                // if(errorMessage == "OTP has Expired." ){
+                //     setEnterOTP(false)
+                // } else if(errorMessage == "OTP is Invalid."){
+                //     setFormData({ ...formData, otp: "" });
+                //     }
+            } else{
+                const message = await response.text(); // Use response.json() if server returns JSON
+                toast.success("Password Reset Successfull")
+                setShowToken(false);
+                setShowForgotPassword(false);
+                setShowForgotUserName(false);
+                var val = await response.json()
+                navigate("/login");
+            }
+        
+            // const data = await response.json();
+            // console.log(data);
+          } catch (error) {
+            toast.error('Error making POST request:');
+          }
+    }
     return (
         <>
            <Headers/>
         <div className="login-container" >
             <header className="login-header">
                 <img style = {{width: "5rem"}} src={logo} alt="logo"/>
-                <h1 className="hospital-name">LOG IN</h1>
+                <h1 className="hospital-name">{!enterOTP && !showForgotPassword 
+                && !showForgotUserName && !showToken ?  "Login" :  !enterOTP && showForgotPassword ? "Forgot Password" :
+                 !enterOTP && showToken ? "Enter Token" : enterOTP ?  "Enter OTP" : "Forgot UserName"}</h1>
             </header>
             <div className="login-box">
                 {!enterOTP? (
-                <><form onSubmit={handleSubmit}>
+                <>
+                {!showForgotPassword && !showForgotUserName && !showToken ? (<>
+                <form onSubmit={handleSubmit}>
+                    
                             <div className="input-group">
                                 <label htmlFor="username">Username</label>
                                 <TextField
@@ -144,10 +269,101 @@ const LoginPage: React.FC = () => {
                                     required
                                     style={{ background: "#a0c8dc" }} />
                             </div>
-                           <Button onClick={backendCall}>Login</Button><br/>
+                           <Button sx={{border: "2px solid black", marginLeft: "40%"}} onClick={backendCall}>Login</Button><br/>
                             New User ? <Button onClick={handleRegister}>Register</Button>
-                        </form><a href="#" className="forgot-password">Forgot Password?</a></>
+                        </form><Button onClick={() => {setShowForgotUserName(true); setShowForgotPassword(false)}}  sx={{display: "block", marginTop: "10px", textAlign: "center", color: "#007bff"}} >Forgot UserName?</Button>
+                        <Button  onClick={() => {setShowForgotUserName(false); setShowForgotPassword(true)}}  sx={{display: "block", marginTop: "10px", textAlign: "center", color: "#007bff"}}>Forgot Password?</Button></>
+                ) 
+                : 
+                (showForgotPassword ? (
+                  <div className="input-group"><label>Email:</label>
+                    <TextField
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    defaultValue={forgotPassword.email}
+                                    onChange={(e:any) => {setForgotPassword((prevVal) => ({
+                                        ...prevVal,
+                                        email: e.target.value,
+                                      }))}}
+                                    required
+                                    style={{ background: "#a0c8dc", marginBottom: "0.5rem" }} />
+                                    <label>User Name:</label>
+                    <TextField
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    defaultValue={forgotPassword.userName}
+                                    onChange={(e:any) => {setForgotPassword((prevVal) => ({
+                                        ...prevVal,
+                                        userName: e.target.value,
+                                      }))}}
+                                    required
+                                    style={{ background: "#a0c8dc", }} />
+                                    <Button sx={{border: "2px solid black", marginLeft: "40%", marginTop: "1rem"}}  onClick={handleForgotPasswordEmail}>Send Mail</Button>
+                    </div>
+                ) : ( showToken ? (
+                    <div>
+                      <div className="input-group">
+                        <label>Token:</label>
+                    <TextField
+                                    type="text"
+                                    id="text"
+                                    name="text"
+                                    defaultValue={resetPassword.token}
+                                    onChange={(e:any) => {setResetPassword((prevVal) => ({
+                                        ...prevVal,
+                                        token: e.target.value,
+                                      }))}}
+                                    required
+                                    style={{ background: "#a0c8dc" }} /><br/>
+                                    <label>Password:</label>
+                    <TextField
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    defaultValue={resetPassword.password}
+                                    onChange={(e:any) => {setResetPassword((prevVal) => ({
+                                        ...prevVal,
+                                        password: e.target.value,
+                                      }))}}
+                                    required
+                                    style={{ background: "#a0c8dc" }} /><br/>
+                                    <label>Confirm Password:</label>
+                    <TextField
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    defaultValue={resetPassword.confirmPassword}
+                                    onChange={(e:any) => {setResetPassword((prevVal) => ({
+                                        ...prevVal,
+                                        confirmPassword: e.target.value,
+                                      }))}}
+                                    required
+                                    style={{ background: "#a0c8dc" }} />
+                                    <Button sx={{border: "2px solid black", marginLeft: "40%"}}  onClick={handleResetPassword}>Reset Password</Button>
+                    </div></div>
                 ) :(
+                  <div>
+                  <div className="input-group">
+                                <label htmlFor="username">Email:</label>
+                                <TextField
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    defaultValue={forgotUserEmail}
+                                    onChange={(e:any) => {setForgotUserEmail(e.target.value)}}
+                                    style={{ background: "#a0c8dc", maxHeight: "2rem" }} />
+                            </div>
+                    
+                                    <Button sx={{border: "2px solid black", marginLeft: "30%"}}  onClick={handleForgotUserNameEmail}>Send UserName</Button>
+                    </div>
+                )
+                )
+                
+                )}
+                </>
+                    ) :(
                     <div><div className="input-group">
                     <label htmlFor="text">OTP sent to your Registered Email</label>
                     <TextField
@@ -159,7 +375,7 @@ const LoginPage: React.FC = () => {
                         required
                         style={{ background: "#a0c8dc" }} />
                 </div>
-                <Button onClick={handleOptVerify}>Verify OTP</Button></div>
+                <Button sx={{border: "2px solid black", marginLeft: "40%"}}  onClick={handleOptVerify}>Verify OTP</Button></div>
                 )}
             </div>
             <footer className="login-footer">

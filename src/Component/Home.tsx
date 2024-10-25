@@ -7,7 +7,6 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store'; 
 import { HospitalDetails } from './HospitalDetails';
-
 const Home: React.FC = () => {
 
   const containerStyle = {
@@ -49,7 +48,7 @@ const Home: React.FC = () => {
         const data = await response.json();
         setLocationDetails(data);
       } catch (error) {
-        console.error('Error making POST request:', error);
+        toast.error('Error making POST request:');
       }
     }
     fetchDetails()
@@ -58,7 +57,6 @@ const Home: React.FC = () => {
   const handleLocationSelect = (e: any) => {
     setValue(e);
     setSelectedLocation(e)
-    console.log(e, "newVal")
   }
 
 useEffect(() => {
@@ -76,13 +74,10 @@ useEffect(() => {
         toast.error(errorMessage);
     }
     const value = await response.json()
-    console.log(value,"log")
     setHospDtlsByLoc(value);
 
-    // const data = await response.json();
-    // console.log(data);
   } catch (error) {
-    console.error('Error making POST request:', error);
+    toast.error('Error making POST request:');
   }
   getSplDtlsByLoc();
 }
@@ -106,13 +101,10 @@ fetchHospitalDtls()
             toast.error(errorMessage);
         }
         const value = await response.json()
-        console.log(value,"log")
         setHospDtlsByLoc(value);
     
-        // const data = await response.json();
-        // console.log(data);
       } catch (error) {
-        console.error('Error making POST request:', error);
+        toast.error('Error making POST request:');
       }
       getSplDtlsByLoc();
     }
@@ -136,7 +128,7 @@ fetchHospitalDtls()
     //   setShowLocation(false)
   
     //   // const data = await response.json();
-    //   // console.log(data);
+    //   // .log(data);
     // } catch (error) {
     //   console.error('Error making POST request:', error);
     // }
@@ -170,8 +162,10 @@ fetchHospitalDtls()
         <Button onClick={handleSearchLocation} sx={{background: "#067492 !important", color: "white"}}><ArrowForwardIcon /></Button>
       </Grid>
       ) : ( */}
+      {/* <Chatbot/> */}
           <HospitalDetails hospDtlsByLoc={hospDtlsByLoc} spltNameList={spltNameList} locationList={locationDetails}/>
         
+
       {/* )} */}
       </div>
       </div>

@@ -23,7 +23,7 @@ const SignUp = () => {
     const userName = useSelector((state: RootState) => state.user.userName);
   
 
- console.log(userName, "useNameSign")
+    console.log(userName, "useNameSign")
  
     const handleFirstNameChange = (e: any) => {
         setUser((prevVal) => ({
@@ -81,7 +81,7 @@ const SignUp = () => {
             }
         
           } catch (error) {
-            console.error('Error making POST request:', error);
+            toast.error('Error making POST request:');
           }
         }
     }
@@ -156,9 +156,8 @@ const SignUp = () => {
                             style={{background: "#a0c8dc"}}
                         />
                     </div>
-                    <Button onClick={handleSubmit}>Register</Button>
+                    <Button sx={{border: "2px solid black", marginLeft: "40%"}}  onClick={handleSubmit}>Register</Button>
                 </form>
-                <a href="#" className="forgot-password">Forgot Password?</a>
             </div>
             <footer className="login-footer">
                 <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> | <a href="#">Contact Us</a>
