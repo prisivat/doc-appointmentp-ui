@@ -1,4 +1,4 @@
-import { Autocomplete, CardHeader, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Autocomplete, CardHeader, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -17,6 +17,7 @@ import { useAppSelector } from '../reduxHooks';
 import { useSelector, useDispatch } from 'react-redux';
 import { Avatar } from '@mui/material';
 import { Telegram } from '@mui/icons-material';
+import { RootState } from '../store';
 
 
 
@@ -39,6 +40,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
   const dispatch = useDispatch();
   const [costFilter, setCostFilter] = useState(10);
   const [filterValues, setFilterValues] = useState({hospitalName: [], cost: "5000", specialist:[], location:""})
+  const userName = useSelector((state: RootState) => state.user.userName);
 
   const handleSliderChange = (e: any) => {
     setCostFilter(e.target.value);
@@ -99,13 +101,13 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
       .filter((loc) => loc === location) // Filter by location
       .reduce((result: any, loc) => {
         const filteredHospitals = data[loc].map((hospital: any) => {
-          const filteredSpecialists = hospital.specalist.filter(
+          const filteredSpecialists = hospital.specialist.filter(
             (specialist: any) => specialist.spclName === specialization
           );
           if (filteredSpecialists.length > 0) {
             return {
               ...hospital,
-              specalist: filteredSpecialists,
+              specialist: filteredSpecialists,
             };
           }
           return null;
@@ -155,15 +157,19 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
 
   },[locationSelected])
 
-  function handleBookAppointment(docName: any, time: any, hospitalName: any, location: any, specalist:any): void {
-    dispatch(hospitalDetails({
+  function handleBookAppointment(docName: any, cost: any, hospitalName: any, location: any, specialist:any): void {
+    if(userName == undefined || userName == null){
+      toast.error("Please Login to Book Appointment")
+    }else{
+      dispatch(hospitalDetails({
       docName: docName,
-      time: time,
+      cost: cost,
       hospitalName: hospitalName,
       location: location,
-      specalist:specalist
+      specialist:specialist
     }));
-    navigate("/bookAppointment")
+    navigate("/bookAppointment")    
+  }
   }
 
   const handleLocationChange =(e:any) => {
@@ -183,7 +189,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
                 <Typography sx={{ fontSize: "1.5rem !important", color: "black" }} color="text.primary" gutterBottom>
                   <b>{hospital?.name}</b>
                 </Typography>
-                {hospital?.specalist && hospital.specalist?.map((specalistVal: any) => (
+                {hospital?.specialist && hospital.specialist?.map((specalistVal: any) => (
                             <div>
                               {specalistVal?.doctorsList[0]?.docNameAndAvblTime.map((docName: any) => (
 
@@ -210,9 +216,13 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
                       <Grid xs={6} sx={{ borderLeft: "2px solid black", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                         <div style={{ marginBottom: "5px" }}>Monday to Sunday (09:00 To 20:00) </div>
                         <Button onClick={() => handleContactDetails(hospital.name)} sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Contact Hospital</Button>
-                        <Button onClick={() => handleBookAppointment(docName?.docName, docName?.availableTime, hospital?.name, city?.location, specalistVal.spclName)} sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Book Appointment</Button>
+                        <Tooltip  title = {userName == undefined || userName == null ? "Please Login to Book Appointment" : " Book Appointment" }> 
+                          <Button 
+                          onClick={() => handleBookAppointment(docName?.docName, docName?.cost, hospital?.name, city?.location, specalistVal.spclName)} 
+                          sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Book Appointment</Button>
+                        </Tooltip>
                         {openModel && (
-                          <Model hospitalDetails={hospName} opeModel={openModel} setOpeModel={setOpenModel} />
+                          <Model title={hospName} opeModel={openModel} setOpeModel={setOpenModel} isHospDtls={true} />
                         )}
 
                       </Grid>
@@ -368,11 +378,11 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
       </Select>
     </FormControl>  */}
           <Button sx={{ background: "#067492 !important", color: "white", marginBottom: "5px", marginTop: "2rem" }} onClick={handleReset} >RESET</Button>
-          <Button sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} onClick={handleFilter} >FILTER</Button>
+          <Button  sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} onClick={handleFilter} >FILTER</Button>
         </div>
       </Grid>
 
-    </Grid>
-  )
+    </Grid> 
+  )  
 }
 

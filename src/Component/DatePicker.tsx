@@ -24,8 +24,7 @@ const DatePicker = ({setDate, listOfTime}: Props) => {
   const userName = useSelector((state: RootState) => state.user.userName);
   const hospName = useSelector((state: RootState) => state.user.hospitalName);
   const docName = useSelector((state: RootState) => state.user.docName);
-  const specalist = useSelector((state: RootState) => state.user.specalist);
-  const availableTime = useSelector((state: RootState) => state.user.time);
+  const specialist = useSelector((state: RootState) => state.user.specialist);
   const location = useSelector((state: RootState) => state.user.location);
 
 
@@ -34,8 +33,7 @@ const DatePicker = ({setDate, listOfTime}: Props) => {
     const currentDate = moment();
     const dateRange:any = [];
 
-    // Generate dates ±5 days from the current date
-    for (let i = 0; i <= 7; i++) {
+    for (let i = 1; i <= 7; i++) {
       dateRange.push(moment(currentDate).add(i, 'days').format('YYYY-MM-DD'));
     }
 
@@ -48,7 +46,8 @@ const DatePicker = ({setDate, listOfTime}: Props) => {
   };
 
   const handleSubmit = async() => {
-    if(docName == "" || hospName == "" || specalist =="" || location == "" || patientName == "" || age == "" || gender == "" || phoneNumber == "" || selectedDate == "" || selectedTime == ""){
+    
+    if(docName == "" || hospName == "" || specialist =="" || location == "" || patientName == "" || age == "" || gender == "" || phoneNumber == "" || selectedDate == "" || selectedTime == ""){
       toast.error("Please Fill all fields")
       return;
     }
@@ -57,7 +56,7 @@ const DatePicker = ({setDate, listOfTime}: Props) => {
       return;
     }
     const body = {"userName" : userName, "docName" : docName, "hospitalName" : hospName,
-      "specialist" : specalist, "location" : location, "patientName" : patientName, "age" : age, "gender" : gender, "phoneNumber" : phoneNumber,
+      "specialist" : specialist, "location" : location, "patientName" : patientName, "age" : age, "gender" : gender, "phoneNumber" : phoneNumber,
       "date" : selectedDate, "time" : selectedTime
       }
         try {

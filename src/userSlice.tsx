@@ -3,19 +3,21 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface UserState {
   userName?: any;
   docName?: string,
-  time?: string,
+  cost?: string,
   hospitalName?: string,
   location?: string,
-  specalist?: string
+  specialist?: string
+  schedularName?:any;
 }
 
 const initialState: UserState = {
   userName: "",
   docName: "",
-  time: "",
+  cost: "",
   hospitalName: "",
   location: '',
-  specalist: ""
+  specialist: "",
+  schedularName:""
 };
 
 export const userSlice = createSlice({
@@ -28,15 +30,21 @@ export const userSlice = createSlice({
             clearUser: (state) => {
               state.userName = null;
             },
+            schedularDetails: (state, action: PayloadAction<UserState>) => {
+              state.schedularName = action.payload.schedularName;
+              },    
+              clearSchedular: (state) => {
+                state.schedularName = null;
+              },
         hospitalDetails:  (state, action: PayloadAction<UserState>) => {
           state.hospitalName = action.payload.hospitalName;
-          state.time = action.payload.time;
+          state.cost = action.payload.cost;
           state.docName = action.payload.docName;
           state.location = action.payload.location;         
-          state.specalist = action.payload.specalist;
+          state.specialist = action.payload.specialist;
         }
     }
 });
 
-export const { userDetails, hospitalDetails, clearUser} = userSlice.actions;
+export const { userDetails, hospitalDetails, clearUser,schedularDetails} = userSlice.actions;
 export default userSlice.reducer;

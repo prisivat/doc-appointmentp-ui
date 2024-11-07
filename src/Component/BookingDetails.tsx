@@ -19,10 +19,10 @@ import { toast } from "react-toastify";
 const BookingDetails = () => {
     const hospName = useSelector((state: RootState) => state.user.hospitalName);
     const docName = useSelector((state: RootState) => state.user.docName);
-    const specalist = useSelector((state: RootState) => state.user.specalist);
-    const availableTime = useSelector((state: RootState) => state.user.time);
+    const specalist = useSelector((state: RootState) => state.user.specialist);
+    const cost = useSelector((state: RootState) => state.user.cost);
     const location = useSelector((state: RootState) => state.user.location);
-    const [selectedDate,setSelectedDate] = useState();
+    const [selectedDate,setSelectedDate] = useState(new Date());
     const [timeList, setTimeList] = useState<any>(["10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"]);
  
     useEffect(() => {
@@ -73,7 +73,7 @@ const BookingDetails = () => {
                 </Grid>
                 <Grid item xs={12} sx={{display: "flex", flexDirection: "column", alignItems: "center", margin: "1rem"}}>
                     <Grid sx={{display: "flex", alignItems: "center"}}><Avatar sx={{marginRight: "10px"}}/> {docName}</Grid> <br/>
-                    <Grid ><b>COST:</b> 500 Rs.</Grid>
+                    <Grid ><b>COST:</b> {cost}Rs.</Grid>
                 </Grid>
                 <Grid item xs={12} sx={{  marginLeft: "1rem", marginRight: "1rem", display: "flex", justifyContent: "center", maxHeight: "15rem !important", overflow: "scroll"}}>
                 <DatePicker listOfTime = {timeList} setDate={setSelectedDate}/>

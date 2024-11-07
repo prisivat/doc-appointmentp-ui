@@ -21,11 +21,13 @@ const BootstrapDialog = styled(Dialog)(({ theme:any }) => ({
   interface Props {
     opeModel: any;
     setOpeModel: any;
-    hospitalDetails: any;
+    title: any;
+    isHospDtls:any;
+    body?:any;
   }
-const Model = ({opeModel, setOpeModel, hospitalDetails}: Props) => {
+const Model = ({opeModel, setOpeModel, title,isHospDtls,body}: Props) => {
     const [open, setOpen] = React.useState(opeModel);
-    const hospitalNameMail =  hospitalDetails.replace(/ /g, '')
+    const hospitalNameMail =  title.replace(/ /g, '')
 
     const handleClickOpen = () => {
       setOpen(true);
@@ -54,7 +56,7 @@ return(
       }}
     >
       <DialogTitle sx={{ m: 0, p: 2, fontWeight: 'bold'}} id="customized-dialog-title">
-       {hospitalDetails}
+       {title}
       </DialogTitle>
       <IconButton
         aria-label="close"
@@ -69,10 +71,13 @@ return(
         <CloseIcon />
       </IconButton>
       <DialogContent dividers>
-        <Typography gutterBottom>
+        {isHospDtls ?
+        (<Typography gutterBottom>
           <div style = {{display: "flex"}}><PhoneInTalkIcon/>   Contact : 044 - 23143532,  044-23139232<br/></div>
           <div style = {{display: "flex"}}> <MailOutlineIcon/>   Email: {hospitalNameMail}@gmail.com</div>
-        </Typography>
+        </Typography>) :
+        (<div>{body}</div>)
+        }
       </DialogContent>
      </BootstrapDialog>
   </React.Fragment>

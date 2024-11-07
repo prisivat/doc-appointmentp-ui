@@ -7,17 +7,19 @@ import { RootState } from '../store';
 // import dayGridPlugin from "@fullcalendar/daygrid";
 // import timeGridPlugin from "@fullcalendar/timegrid";
 
-import "@fullcalendar/core/main.css";
-import "@fullcalendar/daygrid/main.css";
-import "@fullcalendar/timegrid/main.css";
+// import "@fullcalendar/core/main.css";
+// import "@fullcalendar/daygrid/main.css";
+// import "@fullcalendar/timegrid/main.css";
 import MyCalendar from './MyCalendar';
+
+import Headers from './Header';
 
 
 function BookingHistory() {
     const userName = useSelector((state: RootState) => state.user.userName);
     let firstDaty = 1;
-    const [event, setEvent] = useState<any>([{ title: "AZUL +5", start: "09-09-2024" },
-    ])
+    const [event, setEvent] = useState<any>("11-11-2024")
+    const [localHospitalDetails, setLocalHospitalDetails] = useState();
 
     function getDate(date:any) {
         const today = new Date();
@@ -44,7 +46,7 @@ function BookingHistory() {
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({userName: userName }),
+              body: (userName),
             });
         
             if (!response.ok) {
@@ -52,7 +54,8 @@ function BookingHistory() {
                 toast.error(errorMessage);
             } else{
               var val = await response.json()
-                // setLocalHospitalDetails([val])
+              console.log(val,"History")
+                setLocalHospitalDetails(val)
             }
         
             // const data = await response.json();
@@ -64,8 +67,10 @@ function BookingHistory() {
         bookingHistory();
     },[])
   return (
-    <div style={{marginTop: "10rem"}}>BookingHistory
-    <MyCalendar/>
+    <>
+    <Headers/>
+    <div style={{marginTop: "5rem", display: "flex", justifyContent: "center",marginLeft: "-20rem"}}>
+    <MyCalendar event={localHospitalDetails}/>
         {/* <FullCalendar
         defaultView="dayGridMonth"
         firstDay={firstDaty}
@@ -80,6 +85,7 @@ function BookingHistory() {
         events={event}
       /> */}
     </div>
+    </>
   )
 }
 

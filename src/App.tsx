@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux';
 import { clearUser } from './userSlice';
 import BookingHistory from './Component/BookingHistory';
 import MyCalendar from './Component/MyCalendar';
+import SchedularLogin from './Component/SchedularLogin';
 
 
 
@@ -48,14 +49,18 @@ function App() {
       },
       {
         path: "/bookingHistory",
-        element: <MyCalendar/>
+        element: <BookingHistory/>
+      },
+      {
+        path: "/schedularLogin",
+        element: <SchedularLogin/>
       }
     ]
   )
   const userName = useSelector((state: RootState) => state.user.userName);
-  useEffect(() => {
-    disaptach(clearUser());
-  },[])
+  // useEffect(() => {
+  //   disaptach(clearUser());
+  // },[])
 
 
  console.log(userName, "App")
@@ -72,8 +77,6 @@ function App() {
 
 
 export default App;
-
-
 
 
 

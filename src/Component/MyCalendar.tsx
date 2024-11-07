@@ -1,39 +1,52 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const localizer = momentLocalizer(moment);
+interface Props {
+event:any;
+}
+const MyCalendar = ({event}:Props) => {
+  console.log(event,"event")
+  const [events, setEvents] = useState([]);
 
-const MyCalendar = () => {
-  const [events, setEvents] = useState([
-    {
-      title: 'Meeting with John',
-      start: new Date(2024, 8, 23, 14, 0),
-      end: new Date(2024, 8, 23, 15, 0),
-      desc: 'Discuss project progress'
-    },
-    {
-      title: 'Doctor Appointment',
-      start: new Date(2024, 8, 24, 11, 30),
-      end: new Date(2024, 8, 24, 12, 30),
-      desc: 'Routine checkup'
-    },
-  ]);
+  useEffect (() => {
+    var listOfEvent : any = [];
+    event?.forEach((item:any) => {
+      listOfEvent.push({
+        age : item.age,
+        bookingId : item.bookingId,
+        dateAndTime : item.dateAndTime,
+        docName : item. docName, 
+        gender : item.gender, 
+        hospitalName : item.hospitalName,
+        location : item.location,
+        phoneNumber : item.phoneNumber,
+        specialist : item.specialist,
+        title: 'Appointment Details of ' + item.patientName,
+        start: item.dateAndTime,
+        end: item.dateAndTime,
+      })
+  })
+  setEvents(listOfEvent);
+  })
 
-  const handleSelectEvent = (event:any) => {
-    alert(`Event: ${event.title}\nDescription: ${event.desc}`);
+  const handleSelectEvent = (item:any) => {
+    alert(`${item.title}\nage : ${item.age}\nDoctor Name: ${item.docName}\nPatient Gender : ${item.gender}\nHospital Name : ${item.hospitalName}\nLocation : ${item.location}\nPhone Number : ${item.phoneNumber}\nSpecialist : ${item.specialist}`);
   };
 
   return (
-    <div>
-      <h2>My Calendar</h2>
+    <div style={{ padding: '20px',}}>
+      <div style = {{color: "#3174ad", "fontSize": "xx-large", fontWeight: "bolder", background: "white"}}>Booking History</div>
       <Calendar
         localizer={localizer}
         events={events}
         startAccessor="start"
         endAccessor="end"
-        style={{ height: 500 }}
+        
+        views={{ month: true}} 
+        style={{ height: '500px', width: '200%', backgroundColor: '#ffffff', borderRadius: '8px', padding: '20px' }}
         onSelectEvent={handleSelectEvent} // Event click handler
       />
     </div>
