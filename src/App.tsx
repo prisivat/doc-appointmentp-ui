@@ -15,7 +15,9 @@ import { useDispatch } from 'react-redux';
 import { clearUser } from './userSlice';
 import BookingHistory from './Component/BookingHistory';
 import MyCalendar from './Component/MyCalendar';
-import SchedularLogin from './Component/SchedularLogin';
+import SchedulerSignIn from './Component/SchedulerSignin';
+import SchedulerLogin from './Component/SchedulerLogin';
+import SchedulerHome from './Component/SchedulerHome';
 
 
 
@@ -52,9 +54,17 @@ function App() {
         element: <BookingHistory/>
       },
       {
-        path: "/schedularLogin",
-        element: <SchedularLogin/>
-      }
+        path: "/schedulerLogin",
+        element: <SchedulerLogin/>
+      },
+      {
+        path: "/schedulerSignIn",
+        element: <SchedulerSignIn/>
+      } ,
+      {
+        path: "/schedulerHome",
+        element: <SchedulerHome/>
+      } 
     ]
   )
   const userName = useSelector((state: RootState) => state.user.userName);

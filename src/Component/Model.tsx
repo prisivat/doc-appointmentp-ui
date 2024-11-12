@@ -77,7 +77,7 @@ return(
           <div style = {{display: "flex"}}> <MailOutlineIcon/>   Email: {hospitalNameMail}@gmail.com</div>
         </Typography>) :
         (<div>{body}</div>)
-        }
+        } 
       </DialogContent>
      </BootstrapDialog>
   </React.Fragment>

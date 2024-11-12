@@ -128,8 +128,10 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
 
   }
 
-  useEffect (() => {
-    var location = locationSelected;
+  const handleLocSelect =(e:any) => {
+    const loc =e.target.value;
+    setLocationSelected(e.target.value)
+    var location = loc;
     const fetchFilterValues = async () => {
       try {
         const response = await fetch(`http://localhost:8082/hospital/filterDtls/${location}`, {
@@ -155,7 +157,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
     fetchFilterValues();
     }
 
-  },[locationSelected])
+  }
 
   function handleBookAppointment(docName: any, cost: any, hospitalName: any, location: any, specialist:any): void {
     if(userName == undefined || userName == null){
@@ -240,13 +242,15 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
         ))} 
       </Grid>
       <Grid item xs={4} sx={{ marginRight: "5rem", marginBottom: "5rem" }}>
-        <div style={{ background: "white", height: "100%", width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ background: "white", height: "100%", display: "flex", padding: "2rem",
+            alignItems: "stretch", flexDirection: "column", justifyContent: "center"}}>
           Location: 
 
-          <FormControl sx={{ m: 1, minWidth: 120 }}>
+          <FormControl sx={{ m: 1, minWidth: 120, marginTop:"1rem"  }}>
+          <InputLabel id="location-label">Select Location</InputLabel>
         <Select
           value={locationSelected}
-          onChange={handleLocationChange}
+          onChange={handleLocSelect}
           inputProps={{ 'aria-label': 'Without label' }}
         >
           <MenuItem value="">
@@ -263,13 +267,13 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
        
             <>
 
-            <div>Hospital Name :
+            <div style={{marginTop:"5px"}}>Hospital Name :
             <Autocomplete
   multiple
   id="combo-box-demo"
   options={hospitalNameFilterList}
   getOptionLabel={(option: any) => option}
-  sx={{ width: 300, background: "white" }}
+  sx={{ width: "100%", background: "white", marginTop:"1rem"  }}
   value={filterValues.hospitalName}
   onChange={(e, value:any) => {
     setFilterValues((val) => ({
@@ -285,13 +289,13 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
     />
   )}
 />
-            </div><div>Specalist :
+            </div><div style={{marginTop:"10px"}}>Specalist :
             <Autocomplete
           multiple
           id="combo-box-demo"
           options={specalistFilterList}
           getOptionLabel={(option: any) => option}
-          sx={{ width: 300, background: "white" }}
+          sx={{ width: "100%", background: "white", marginTop:"1rem" }}
           value={filterValues.specialist}
           onChange={(e : any, value: any) => {
             setFilterValues((val) => ({
@@ -308,7 +312,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
           )}
         />
               </div>
-              <div>Cost :
+              <div style={{marginTop:"15px"}}>Cost :
         <input
         type="range"
         min="1000"

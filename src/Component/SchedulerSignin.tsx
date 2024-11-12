@@ -1,48 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import './login.css'; // Importing the CSS file
 import logo from "../assets/logo.png"
-import { Autocomplete, Button, FormControl, MenuItem, Select, TextField } from '@mui/material';
+import { Autocomplete, Button, FormControl, Grid, MenuItem, Select, TextField } from '@mui/material';
 import { toast } from 'react-toastify';
 import Headers from './Header';
 import { useSelector, useDispatch } from 'react-redux';
-import userSlice, { userDetails } from "../userSlice"
+import userSlice, { schedulerDetails, userDetails } from "../userSlice"
 import { useAppSelector } from '../reduxHooks';
 import { useNavigate } from "react-router-dom";
-import SchedularHeader from './SchedularHeader';
+import SchedulerHeader from './SchedulerHeader';
+import { Password } from '@mui/icons-material';
 
 
 // Define the state interface for the form
 interface LoginFormState {
   otp: unknown;
-  schedularName: string;
+  schedulerName: string;
   password: string;
 }
 
-const SchedularLogin: React.FC = () => {
-  const [formData, setFormData] = useState<LoginFormState>({ schedularName: '', password: '', otp: "" });
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [showForgotUserName, setShowForgotUserName] = useState(false);
-  const [showToken, setShowToken] = useState(false)
-  const [forgotPassword, setForgotPassword] = useState({ email: "", schedularName: "" })
-  const [forgotUserEmail, setForgotUserEmail] = useState("");
-  const [resetPassword, setResetPassword] = useState({ token: "", password: "", confirmPassword: "" })
+const SchedulerSignIn: React.FC = () => {
+  const [formData, setFormData] = useState<LoginFormState>({ schedulerName: '', password: '', otp: "" });
   const dispatch = useDispatch();
   const [enterOTP, setEnterOTP] = useState(false);
-  const [registerSchedular, setRegisterSchedular] = useState(false);
-
+  const [registerScheduler, setRegisterScheduler] = useState(false);
+  const [otpValue, setOtpValue] = useState("")
+  const [schedulerName, setSchedulerName] = useState("")
+  const [schedulerPassword, setSchedulerPassword] = useState("")
   const navigate = useNavigate();
+  const [locationDetails, setLocationDetails] = useState<string[]>([]);
+  const [locationSelected, setLocationSelected] = useState<any>("");
+  const [hospitalNameFilterList, setHospitalNameFilterList] = useState([]);
+  const [hospitalName, setHospitalName] = useState("")
 
 
-  const backendCall = async () => {
-    if (formData.password == "" || formData.schedularName == "") {
-      toast.error(formData.schedularName == "" ? "User Name is Mandatory" : "Passowrd is Mandatory")
+  const handleRegisterScheduler = async () => {
+
+    if (schedulerPassword == "") {
+      toast.error("Please enter Password")
     } else {
-      var body = { schedularName: formData.schedularName, password: formData.password }
+      var body = { hospitalName: hospitalName, location: locationSelected, otp: otpValue ,password : schedulerPassword}
+      setSchedulerName(hospitalName + locationSelected)
       dispatch(userDetails({
-        schedularName: formData.schedularName
+        schedulerName: hospitalName + locationSelected
       }));
       try {
-        const response = await fetch('http://localhost:8082/api/patient/login', {
+        const response = await fetch('http://localhost:8082/api/scheduler/save-scheduler', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -53,8 +56,12 @@ const SchedularLogin: React.FC = () => {
         if (!response.ok) {
           const errorMessage = await response.text(); // Use response.json() if server returns JSON
           toast.error(errorMessage);
+          
         } else {
-          setEnterOTP(true);
+          setRegisterScheduler(false)
+          setEnterOTP(false)
+          toast.success("Scheduler Registered Successfully.")
+          navigate("/schedulerHome")
         }
 
         // const data = await response.json();
@@ -63,31 +70,19 @@ const SchedularLogin: React.FC = () => {
         toast.error('Error making POST request:');
       }
     }
-
   }
 
-  // if (loading) return <p>Loading...</p>;
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Handle form submission (e.g., API call)
-  };
-
   const handleOptVerify = async (e: any) => {
-    if (formData.otp == "") {
+    if (otpValue == "") {
       toast.error("Please enter OTP")
     } else {
-      var body = { schedularName: formData.schedularName, otp: formData.otp }
+      var body = { hospitalName: hospitalName, location: locationSelected, otp: otpValue }
+      setSchedulerName(hospitalName + locationSelected)
       dispatch(userDetails({
-        schedularName: formData.schedularName
+        schedulerName: hospitalName + locationSelected
       }));
       try {
-        const response = await fetch('http://localhost:8082//api/scheduler/verify-otp', {
+        const response = await fetch('http://localhost:8082/api/scheduler/verify-otp', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -104,7 +99,8 @@ const SchedularLogin: React.FC = () => {
             setFormData({ ...formData, otp: "" });
           }
         } else {
-          navigate("/");
+          setRegisterScheduler(true)
+          setEnterOTP(false)
         }
 
         // const data = await response.json();
@@ -114,94 +110,12 @@ const SchedularLogin: React.FC = () => {
       }
     }
   }
-  const handleRegister = () => {
-setRegisterSchedular(true)
-  }
-
-  const handleForgotPasswordEmail = async () => {
+  const handleRegister = async () => {
+    
+    setEnterOTP(true)
+    var data = {"hospitalName": hospitalName, "location": locationSelected}
     try {
-      const response = await fetch('http://localhost:8082/api/patient/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(forgotPassword),
-      });
-
-      if (!response.ok) {
-        const errorMessage = await response.text(); // Use response.json() if server returns JSON
-        toast.error(errorMessage);
-        // if(errorMessage == "OTP has Expired." ){
-        //     setEnterOTP(false)
-        // } else if(errorMessage == "OTP is Invalid."){
-        //     setFormData({ ...formData, otp: "" });
-        //     }
-      } else {
-        const message = await response.text(); // Use response.json() if server returns JSON
-        toast.success("Token sent to your email")
-        setShowToken(true);
-        setShowForgotPassword(false);
-        setShowForgotUserName(false);
-        var val = await response.json()
-        // navigate("/");
-      }
-
-      // const data = await response.json();
-      // console.log(data);
-    } catch (error) {
-      toast.error('Error making POST request:');
-    }
-
-
-
-  }
-
-
-  const handleResetPassword = async () => {
-    if (resetPassword.confirmPassword == resetPassword.password) {
-      const data = { token: resetPassword.token, newPassword: resetPassword.password }
-      try {
-        const response = await fetch('http://localhost:8082/api/patient/reset-password', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        });
-
-        if (!response.ok) {
-          const errorMessage = await response.text(); // Use response.json() if server returns JSON
-          toast.error(errorMessage);
-          // if(errorMessage == "OTP has Expired." ){
-          //     setEnterOTP(false)
-          // } else if(errorMessage == "OTP is Invalid."){
-          //     setFormData({ ...formData, otp: "" });
-          //     }
-        } else {
-          const message = await response.text(); // Use response.json() if server returns JSON
-          toast.success("Password Reset Successfull")
-          setShowToken(false);
-          setShowForgotPassword(false);
-          setShowForgotUserName(false);
-          var val = await response.json()
-          navigate("/login");
-        }
-
-        // const data = await response.json();
-        // console.log(data);
-      } catch (error) {
-        toast.error('Error making POST request:');
-      }
-    } else {
-      toast.error("Password and Confirm Password are not same")
-    }
-  }
-
-
-  const handleForgotUserNameEmail = async () => {
-    const data = { "email": forgotUserEmail }
-    try {
-      const response = await fetch('http://localhost:8082/api/patient/forgot-schedularName', {
+      const response = await fetch('http://localhost:8082/api/scheduler/register-scheduler', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -210,7 +124,10 @@ setRegisterSchedular(true)
       });
 
       if (!response.ok) {
-        const errorMessage = await response.text(); // Use response.json() if server returns JSON
+        const errorMessage = await response.text();
+        if(errorMessage =="Scheduler already there for this hospital, Please Login"){
+          navigate("/schedulerLogin")
+        } // Use response.json() if server returns JSON
         toast.error(errorMessage);
         // if(errorMessage == "OTP has Expired." ){
         //     setEnterOTP(false)
@@ -219,12 +136,8 @@ setRegisterSchedular(true)
         //     }
       } else {
         const message = await response.text(); // Use response.json() if server returns JSON
-        toast.success("Password Reset Successfull")
-        setShowToken(false);
-        setShowForgotPassword(false);
-        setShowForgotUserName(false);
-        var val = await response.json()
-        navigate("/login");
+        toast.success("OTP sent to the Hospital Email")
+        
       }
 
       // const data = await response.json();
@@ -233,14 +146,6 @@ setRegisterSchedular(true)
       toast.error('Error making POST request:');
     }
   }
-
-  ////
-
-  const [locationDetails, setLocationDetails] = useState<string[]>([]);
-  const [locationSelected, setLocationSelected] = useState<any>("");
-  const [hospitalNameFilterList, setHospitalNameFilterList] = useState([]);
-  const [hospitalName, setHospitalName] = useState("")
-
 
 
 
@@ -292,7 +197,7 @@ setRegisterSchedular(true)
 
   return (
     <>
-      <SchedularHeader />
+      <SchedulerHeader />
       <div className="login-container" >
         <header className="login-header">
           <img style={{ width: "5rem" }} src={logo} alt="logo" />
@@ -300,21 +205,45 @@ setRegisterSchedular(true)
         </header>
         <div className="login-box">
 
-          {registerSchedular ? (
+          {registerScheduler ? (
             <>
-             {/* schedularName - autoPopulate, Enter Password */}
+             {/* schedulerName - autoPopulate, Enter Password */}
+             <div style={{display: "flex", alignItems: "stretch"}}><div className="input-group">
+                <label htmlFor="text">Scheduler Name</label>
+                <TextField
+                  type="text"
+                  id="otp"
+                  name="otp"
+                  value={schedulerName}
+                  disabled={true}
+                  required
+                  style={{ background: "#a0c8dc" }} />
+              </div>
+              <div className="input-group">
+                <label htmlFor="text">Password</label>
+                <TextField
+                  type="password"
+                  id="otp"
+                  name="otp"
+                  value={schedulerPassword}
+                  onChange={(e) => {setSchedulerPassword(e.target.value)}}
+                  required
+                  style={{ background: "#a0c8dc" }} />
+              </div>
+                <Button sx={{ border: "2px solid black", marginLeft: "40%" }} onClick={handleRegisterScheduler}> Register Scheduler</Button></div>
+
             </>
           ) : enterOTP ? (
             <>
               {/* opt */}
-              <div><div className="input-group">
+              <div style={{display: "flex", alignItems: "stretch"}}><div className="input-group">
                 <label htmlFor="text">OTP sent to your Registered Email</label>
                 <TextField
                   type="text"
                   id="otp"
                   name="otp"
-                  value={formData.otp}
-                  onChange={handleInputChange}
+                  value={otpValue}
+                  onChange={(e) => {setOtpValue(e.target.value)}}
                   required
                   style={{ background: "#a0c8dc" }} />
               </div>
@@ -328,8 +257,8 @@ setRegisterSchedular(true)
 
 
 
-               <div>
-                Location:
+               <Grid sx={{marginTop: "1rem", display: "flex", alignContent: "center", alignItems: "center", justifyContent: "center", flexWrap: "wrap"}}>
+                <b>Location:</b>
 
                 <FormControl sx={{ m: 1, minWidth: 120 }}>
                   <Select
@@ -353,12 +282,12 @@ setRegisterSchedular(true)
 
                   <>
 
-                    <div>Hospital Name :
+                    <Grid sx={{marginTop: "1rem", display: "flex", alignContent: "center", alignItems: "center", justifyContent: "center", flexWrap: "wrap"}}><b>Hospital Name :</b>
                       <Autocomplete
                         id="combo-box-demo"
                         options={hospitalNameFilterList}
                         getOptionLabel={(option: any) => option}
-                        sx={{ width: 300, background: "white" }}
+                        sx={{ width: 300, background: "white",marginTop: "1rem", }}
                         value={hospitalName}
                         onChange={(event, newValue:any) => setHospitalName(newValue)}
                         renderInput={(params) => (
@@ -369,27 +298,24 @@ setRegisterSchedular(true)
                           />
                         )}
                       />
-                    </div></>
+                    </Grid></>
                 )}
 
-                <Button onClick={handleRegister} >Create Schedular</Button>
-              </div>
+                <Button  sx={{background: "#067492 !important", color: "white", marginTop: "1rem"}} onClick={handleRegister} >Create Scheduler</Button>
+              </Grid>
 
             </>
           )}
 
 
         </div>
-        <footer className="login-footer">
-          <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> | <a href="#">Contact Us</a>
-        </footer>
-        <button className="help-button">Need Help?</button>
+        
       </div>
     </>
   );
 };
 
-export default SchedularLogin;
+export default SchedulerSignIn;
 
 
 

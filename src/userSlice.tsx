@@ -7,7 +7,7 @@ interface UserState {
   hospitalName?: string,
   location?: string,
   specialist?: string
-  schedularName?:any;
+  schedulerName?:any;
 }
 
 const initialState: UserState = {
@@ -17,7 +17,7 @@ const initialState: UserState = {
   hospitalName: "",
   location: '',
   specialist: "",
-  schedularName:""
+  schedulerName:""
 };
 
 export const userSlice = createSlice({
@@ -30,11 +30,11 @@ export const userSlice = createSlice({
             clearUser: (state) => {
               state.userName = null;
             },
-            schedularDetails: (state, action: PayloadAction<UserState>) => {
-              state.schedularName = action.payload.schedularName;
+            schedulerDetails: (state, action: PayloadAction<UserState>) => {
+              state.schedulerName = action.payload.schedulerName;
               },    
-              clearSchedular: (state) => {
-                state.schedularName = null;
+              clearScheduler: (state) => {
+                state.schedulerName = null;
               },
         hospitalDetails:  (state, action: PayloadAction<UserState>) => {
           state.hospitalName = action.payload.hospitalName;
@@ -46,5 +46,5 @@ export const userSlice = createSlice({
     }
 });
 
-export const { userDetails, hospitalDetails, clearUser,schedularDetails} = userSlice.actions;
+export const { userDetails, hospitalDetails, clearUser,schedulerDetails} = userSlice.actions;
 export default userSlice.reducer;
