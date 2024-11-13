@@ -57,7 +57,7 @@ const Headers = () => {
   return (
     <Grid container className="navbar">
       {openModel && (
-                          <Model body = {body} title= "EasyMed Contact Details" opeModel={openModel} setOpeModel={setOpenModel} isHospDtls={false} />
+                          <Model body={body} title="EasyMed Contact Details" opeModel={openModel} setOpeModel={setOpenModel} isHospDtls={false} iscalendar={false} />
                         )}
 
       <Grid item xs={3}>

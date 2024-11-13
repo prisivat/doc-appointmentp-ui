@@ -4,6 +4,14 @@ import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { Box, Card, CardContent, Typography, Grid, Select, MenuItem } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import dayjs from 'dayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+
+
 
 
 const SchedulerHome: React.FC = () => {
@@ -83,16 +91,53 @@ const SchedulerHome: React.FC = () => {
         // fetchBookingsByDocName(selected); // Fetch filtered data
     };
 
+    const handleDateSelect =async (newValue:any) => {
+        try {
+            const formattedDate = newValue ? dayjs(newValue).format('YYYY-MM-DD') : '';
+            const body = {hospitalName: "Apollo Hospital", location: "Chennai", date:formattedDate};
+            const response = await fetch('http://localhost:8082/appointment/scheduler-appointments', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(body),
+            });
+    
+            if (!response.ok) {
+              const errorMessage = await response.text(); // Use response.json() if server returns JSON
+              toast.error(errorMessage);
+              
+            } else {
+                const data = await response.json();
+                setScedulerDetails(data);
+            }
+    
+          } catch (error) {
+            toast.error('Error making POST request:');
+          }
+    }
+
+    
+  const bodyStyle = {
+    margin: 0,
+    padding: 0,
+    fontFamily: 'Arial, sans-serif',
+    display: 'flex',
+    
+    height: '100vh',
+  };
+
     return(
         <>
+         <div style={bodyStyle}>
         <SchedulerHeader/>
-        <Grid container xs={12} style={{paddingTop : "35rem", display: "flex"}}>
-            <Grid item xs={12} sx={{  left: 0, display: "flex", flexDirection: "row", justifyContent:"flex-end", marginRight: "2rem", position: "fixed"}}>
+        <Grid container xs={12} style={{display: "flex", paddingTop: "100px"}}>
+            <Grid item xs={12} sx={{right: 0, display: "flex", flexDirection: "row", justifyContent:"flex-end", marginRight: "2rem", position: "fixed"}}>
             <Select
                 value={selectedDocName}
                 onChange={handleFilterChange}
                 displayEmpty
-                sx={{ marginBottom: 2, minWidth: 200, background: "white" }}
+                sx={{ minWidth: 200, background: "white", marginRight: "1rem" }}
             >
                 <MenuItem value="">All Doctors</MenuItem>
                 {docNameList.map((docName) => (
@@ -101,10 +146,18 @@ const SchedulerHome: React.FC = () => {
                     </MenuItem>
                 ))}
             </Select>
+            <LocalizationProvider dateAdapter={AdapterDayjs} >
+            <DemoContainer components={['DatePicker']}>
+        <DatePicker label="Basic date picker" onChange={handleDateSelect} sx={{background:"white"}}/>
+      </DemoContainer>
+    </LocalizationProvider>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} sx={{marginTop: "3rem", maxHeight: "90%", overflowY: schedulerDetails.length == 0 ? "none" : "scroll"}}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: "wrap", marginTop: "1rem" }}>
         
+        {schedulerDetails.length == 0 && (
+            <div style={{background: "white"}}>No Appointment Booked for selected Date</div>
+        )}
             {schedulerDetails.map((booking: any) => (
                 <Card key={booking.bookingId} sx={{ maxWidth: 400, margin: 2, padding: 2, borderRadius: 2, boxShadow: 3 }}>
                     <CardContent>
@@ -149,6 +202,7 @@ const SchedulerHome: React.FC = () => {
         </Box>
         </Grid>
         </Grid>
+        </div>
         </>
     )
 }

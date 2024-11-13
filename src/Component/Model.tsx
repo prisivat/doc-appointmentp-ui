@@ -23,9 +23,10 @@ const BootstrapDialog = styled(Dialog)(({ theme:any }) => ({
     setOpeModel: any;
     title: any;
     isHospDtls:any;
+    iscalendar:any;
     body?:any;
   }
-const Model = ({opeModel, setOpeModel, title,isHospDtls,body}: Props) => {
+const Model = ({opeModel, setOpeModel, title,isHospDtls,body,iscalendar}: Props) => {
     const [open, setOpen] = React.useState(opeModel);
     const hospitalNameMail =  title.replace(/ /g, '')
 
@@ -76,6 +77,7 @@ return(
           <div style = {{display: "flex"}}><PhoneInTalkIcon/>   Contact : 044 - 23143532,  044-23139232<br/></div>
           <div style = {{display: "flex"}}> <MailOutlineIcon/>   Email: {hospitalNameMail}@gmail.com</div>
         </Typography>) :
+        
         (<div>{body}</div>)
         } 
       </DialogContent>

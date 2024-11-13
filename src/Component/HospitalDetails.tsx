@@ -224,7 +224,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
                           sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Book Appointment</Button>
                         </Tooltip>
                         {openModel && (
-                          <Model title={hospName} opeModel={openModel} setOpeModel={setOpenModel} isHospDtls={true} />
+                          <Model title={hospName} opeModel={openModel} setOpeModel={setOpenModel} isHospDtls={true} iscalendar={false} />
                         )}
 
                       </Grid>
