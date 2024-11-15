@@ -39,9 +39,23 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [costFilter, setCostFilter] = useState(10);
-  const [filterValues, setFilterValues] = useState({hospitalName: [], cost: "5000", specialist:[], location:""})
+  const [filterValues, setFilterValues] = useState({ hospitalName: [], cost: "5000", specialist: [], location: "" })
   const userName = useSelector((state: RootState) => state.user.userName);
+  const [isLoading, setIsLoading] = useState(false);
 
+  const Loader = () => (
+    <div style={{
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      fontSize: '1.5em',
+      color: '#333',
+      zIndex: 1
+    }}>
+      Loading...
+    </div>
+  );
   const handleSliderChange = (e: any) => {
     setCostFilter(e.target.value);
   };
@@ -52,13 +66,17 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
 
 
   async function handleFilter(): Promise<void> {
-    if(locationSelected == ""){
+    setIsLoading(true);
+    if (locationSelected == "") {
+      setIsLoading(false);
       toast.error("Please select Location");
-    } else if((filterValues.specialist.length == 0 ||  filterValues.hospitalName.length == 0 ) && locationSelected != ""){
+    } else if ((filterValues.specialist.length == 0 || filterValues.hospitalName.length == 0) && locationSelected != "") {
+      setIsLoading(false);
       toast.error("Please Select both Speaclist and Hospital Name")
-    }else {
-      var final:any = {};
-      final.cost = parseInt(filterValues.cost)  
+    } else {
+
+      var final: any = {};
+      final.cost = parseInt(filterValues.cost)
       final.hospitalName = filterValues.hospitalName
       final.location = locationSelected
       final.specialist = filterValues.specialist
@@ -71,28 +89,31 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
           },
           body: JSON.stringify(final),
         });
-    
+
         if (!response.ok) {
-            const errorMessage = await response.text(); // Use response.json() if server returns JSON
-            toast.error(errorMessage);
-        } else{
+          setIsLoading(false);
+          const errorMessage = await response.text(); // Use response.json() if server returns JSON
+          toast.error(errorMessage);
+        } else {
+          setIsLoading(false);
           var val = await response.json()
-            setLocalHospitalDetails([val])
+          setLocalHospitalDetails([val])
         }
-    
+
         // const data = await response.json();
         // console.log(data);
       } catch (error) {
+        setIsLoading(false);
         toast.error('Error making POST request:');
       }
-      
+
     }
-   
+
   }
   const handleReset = () => {
     setSelectedLocation("")
     setLocalHospitalDetails(hospDtlsByLoc)
-    setFilterValues({hospitalName: [], cost: "5000", specialist:[], location:""})
+    setFilterValues({ hospitalName: [], cost: "5000", specialist: [], location: "" })
   }
 
 
@@ -128,53 +149,60 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
 
   }
 
-  const handleLocSelect =(e:any) => {
-    const loc =e.target.value;
+  const handleLocSelect = (e: any) => {
+    setIsLoading(true);
+    const loc = e.target.value;
     setLocationSelected(e.target.value)
     var location = loc;
     const fetchFilterValues = async () => {
       try {
         const response = await fetch(`http://localhost:8082/hospital/filterDtls/${location}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    if (!response.ok) {
-      const errorMessage = await response.text(); // Use response.json() if server returns JSON
-      setLocationSelected("");
-      toast.error("We are working on this location. Please try other locations");
-  }else{
-        const data = await response.json();
-        setHospitalNameFilterList(data?.hospitalName);
-        setSpecialistFilterList(data?.specialist);
-  }
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          setIsLoading(false);
+          const errorMessage = await response.text(); // Use response.json() if server returns JSON
+          setLocationSelected("");
+          toast.error("We are working on this location. Please try other locations");
+        } else {
+          setIsLoading(false);
+          const data = await response.json();
+          setHospitalNameFilterList(data?.hospitalName);
+          setSpecialistFilterList(data?.specialist);
+        }
       } catch (error) {
+        setIsLoading(false);
         toast.error('Error making POST request:');
       }
     }
-    if(locationSelected != ""){
-    fetchFilterValues();
+    if (locationSelected != "") {
+      fetchFilterValues();
     }
 
   }
 
-  function handleBookAppointment(docName: any, cost: any, hospitalName: any, location: any, specialist:any): void {
-    if(userName == undefined || userName == null){
+  function handleBookAppointment(docName: any, cost: any, hospitalName: any, location: any, specialist: any): void {
+    setIsLoading(true);
+    if (userName == undefined || userName == null) {
       toast.error("Please Login to Book Appointment")
-    }else{
+      setIsLoading(false);
+    } else {
       dispatch(hospitalDetails({
-      docName: docName,
-      cost: cost,
-      hospitalName: hospitalName,
-      location: location,
-      specialist:specialist
-    }));
-    navigate("/bookAppointment")    
-  }
+        docName: docName,
+        cost: cost,
+        hospitalName: hospitalName,
+        location: location,
+        specialist: specialist
+      }));
+      setIsLoading(false);
+      navigate("/bookAppointment")
+    }
   }
 
-  const handleLocationChange =(e:any) => {
+  const handleLocationChange = (e: any) => {
     setLocationSelected(e.target.value)
   }
 
@@ -184,7 +212,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
       justifyContent: "space-around", flexWrap: "nowrap", marginTop: "8rem",
     }} spacing={2}>
       <Grid item xs={6} sx={{ maxHeight: "30rem", overflowY: "scroll" }} >
-        {localHospitalDetails!=undefined && localHospitalDetails?.map((city: any) => (
+        {localHospitalDetails != undefined && localHospitalDetails?.map((city: any) => (
           <div >
             {city?.hospitalDetails?.map((hospital: any, hospitalIndex: number) => (
               <div >
@@ -192,142 +220,144 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
                   <b>{hospital?.name}</b>
                 </Typography>
                 {hospital?.specialist && hospital.specialist?.map((specalistVal: any) => (
-                            <div>
-                              {specalistVal?.doctorsList[0]?.docNameAndAvblTime.map((docName: any) => (
+                  <div>
+                    {specalistVal?.doctorsList[0]?.docNameAndAvblTime.map((docName: any) => (
 
-                <Card sx={{ margin: "10px" }}>
+                      <Card sx={{ margin: "10px" }}>
 
-                  <CardContent>
-                    <Grid container xs={12}>
-                      <Grid xs={6}>
-                        <Grid xs={12} sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start"}}>
-                        <Avatar/>
-                                  <span style={{marginLeft: "1rem"}}>{docName?.docName} </span>
-                        </Grid>
-                        <div style={{fontSize: "14px" , color: "black", margin: "1rem", display: "flex", alignItems: "center", justifyContent: "space-around" }}>  
-                          <Typography sx={{
-                                                        fontSize: ".8rem", border: "1px solid #3d3d81",
-                                                        borderRadius: "2px", background: "#e6f9ff", padding: "5px", maxWidth: "6rem",  
-                                                    }} color="text.secondary">
-                                                        {specalistVal.spclName}
-                                                    </Typography>
+                        <CardContent>
+                          <Grid container xs={12}>
+                            <Grid xs={6}>
+                              <Grid xs={12} sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
+                                <Avatar />
+                                <span style={{ marginLeft: "1rem" }}>{docName?.docName} </span>
+                              </Grid>
+                              <div style={{ fontSize: "14px", color: "black", margin: "1rem", display: "flex", alignItems: "center", justifyContent: "space-around" }}>
+                                <Typography sx={{
+                                  fontSize: ".8rem", border: "1px solid #3d3d81",
+                                  borderRadius: "2px", background: "#e6f9ff", padding: "5px", maxWidth: "6rem",
+                                }} color="text.secondary">
+                                  {specalistVal.spclName}
+                                </Typography>
 
-                        <div style={{ fontSize: "14px", color: "black", }}><b>Location: </b>{city.location}</div>
-                        </div>
-                        </Grid>
-                      <Grid xs={6} sx={{ borderLeft: "2px solid black", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                        <div style={{ marginBottom: "5px" }}>Monday to Sunday (09:00 To 20:00) </div>
-                        <Button onClick={() => handleContactDetails(hospital.name)} sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Contact Hospital</Button>
-                        <Tooltip  title = {userName == undefined || userName == null ? "Please Login to Book Appointment" : " Book Appointment" }> 
-                          <Button 
-                          onClick={() => handleBookAppointment(docName?.docName, docName?.cost, hospital?.name, city?.location, specalistVal.spclName)} 
-                          sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Book Appointment</Button>
-                        </Tooltip>
-                        {openModel && (
-                          <Model title={hospName} opeModel={openModel} setOpeModel={setOpenModel} isHospDtls={true} iscalendar={false} />
-                        )}
+                                <div style={{ fontSize: "14px", color: "black", }}><b>Location: </b>{city.location}</div>
+                              </div>
+                            </Grid>
+                            <Grid xs={6} sx={{ borderLeft: "2px solid black", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                              <div style={{ marginBottom: "5px" }}>Monday to Sunday (09:00 To 20:00) </div>
+                              <Button onClick={() => handleContactDetails(hospital.name)} sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Contact Hospital</Button>
+                              <Tooltip title={userName == undefined || userName == null ? "Please Login to Book Appointment" : " Book Appointment"}>
+                                <Button
+                                  onClick={() => handleBookAppointment(docName?.docName, docName?.cost, hospital?.name, city?.location, specalistVal.spclName)}
+                                  sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Book Appointment</Button>
+                              </Tooltip>
+                              {openModel && (
+                                <Model title={hospName} opeModel={openModel} setOpeModel={setOpenModel} isHospDtls={true} iscalendar={false} />
+                              )}
 
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
+                            </Grid>
+                          </Grid>
+                        </CardContent>
+                      </Card>
+                    ))}
+
+                  </div>
                 ))}
-               
-              </div>
-            ))}
               </div>
             ))}
           </div>
 
-        ))} 
+        ))}
       </Grid>
       <Grid item xs={4} sx={{ marginRight: "5rem", marginBottom: "5rem" }}>
-        <div style={{ background: "white", height: "100%", display: "flex", padding: "2rem",
-            alignItems: "stretch", flexDirection: "column", justifyContent: "center"}}>
-          Location: 
+        <div style={{
+          background: "white", height: "100%", display: "flex", padding: "2rem",
+          alignItems: "stretch", flexDirection: "column", justifyContent: "center"
+        }}>
+          Location:
 
-          <FormControl sx={{ m: 1, minWidth: 120, marginTop:"1rem"  }}>
-          <InputLabel id="location-label">Select Location</InputLabel>
-        <Select
-          value={locationSelected}
-          onChange={handleLocSelect}
-          inputProps={{ 'aria-label': 'Without label' }}
-        >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          {locationList?.map((val: any) => (
-          <MenuItem value={val}>{val}</MenuItem>
-          ))}
-        </Select>
-        
-      </FormControl>
+          <FormControl sx={{ m: 1, minWidth: 120, marginTop: "1rem" }}>
+            <InputLabel id="location-label">Select Location</InputLabel>
+            <Select
+              value={locationSelected}
+              onChange={handleLocSelect}
+              inputProps={{ 'aria-label': 'Without label' }}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {locationList?.map((val: any) => (
+                <MenuItem value={val}>{val}</MenuItem>
+              ))}
+            </Select>
 
-      {locationSelected != "" && (
-       
+          </FormControl>
+
+          {locationSelected != "" && (
+
             <>
 
-            <div style={{marginTop:"5px"}}>Hospital Name :
-            <Autocomplete
-  multiple
-  id="combo-box-demo"
-  options={hospitalNameFilterList}
-  getOptionLabel={(option: any) => option}
-  sx={{ width: "100%", background: "white", marginTop:"1rem"  }}
-  value={filterValues.hospitalName}
-  onChange={(e, value:any) => {
-    setFilterValues((val) => ({
-      ...val,
-      hospitalName: value 
-    }));
-  }}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Select hospitals"
-      variant="outlined"
-    />
-  )}
-/>
-            </div><div style={{marginTop:"10px"}}>Specalist :
-            <Autocomplete
-          multiple
-          id="combo-box-demo"
-          options={specalistFilterList}
-          getOptionLabel={(option: any) => option}
-          sx={{ width: "100%", background: "white", marginTop:"1rem" }}
-          value={filterValues.specialist}
-          onChange={(e : any, value: any) => {
-            setFilterValues((val) => ({
-              ...val,
-              specialist: value
-            }));
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Select locations"
-              variant="outlined"
-            />
-          )}
-        />
+              <div style={{ marginTop: "5px" }}>Hospital Name :
+                <Autocomplete
+                  multiple
+                  id="combo-box-demo"
+                  options={hospitalNameFilterList}
+                  getOptionLabel={(option: any) => option}
+                  sx={{ width: "100%", background: "white", marginTop: "1rem" }}
+                  value={filterValues.hospitalName}
+                  onChange={(e, value: any) => {
+                    setFilterValues((val) => ({
+                      ...val,
+                      hospitalName: value
+                    }));
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select hospitals"
+                      variant="outlined"
+                    />
+                  )}
+                />
+              </div><div style={{ marginTop: "10px" }}>Specalist :
+                <Autocomplete
+                  multiple
+                  id="combo-box-demo"
+                  options={specalistFilterList}
+                  getOptionLabel={(option: any) => option}
+                  sx={{ width: "100%", background: "white", marginTop: "1rem" }}
+                  value={filterValues.specialist}
+                  onChange={(e: any, value: any) => {
+                    setFilterValues((val) => ({
+                      ...val,
+                      specialist: value
+                    }));
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select locations"
+                      variant="outlined"
+                    />
+                  )}
+                />
               </div>
-              <div style={{marginTop:"15px"}}>Cost :
-        <input
-        type="range"
-        min="1000"
-        max="5000"
-        step="500"
-        value={filterValues.cost}
-        onChange={(e) => {
-          setFilterValues((val) => ({
-            ...val,
-            cost: e.target.value
-          }));
-        }}
-      /> {filterValues.cost}
-            </div></>
-      )}
+              <div style={{ marginTop: "15px" }}>Cost :
+                <input
+                  type="range"
+                  min="1000"
+                  max="5000"
+                  step="500"
+                  value={filterValues.cost}
+                  onChange={(e) => {
+                    setFilterValues((val) => ({
+                      ...val,
+                      cost: e.target.value
+                    }));
+                  }}
+                /> {filterValues.cost}
+              </div></>
+          )}
 
 
           {/* <FormControl sx={{ m: 1, minWidth: 340 }}>
@@ -382,11 +412,11 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
       </Select>
     </FormControl>  */}
           <Button sx={{ background: "#067492 !important", color: "white", marginBottom: "5px", marginTop: "2rem" }} onClick={handleReset} >RESET</Button>
-          <Button  sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} onClick={handleFilter} >FILTER</Button>
+          <Button sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} onClick={handleFilter} >FILTER</Button>
         </div>
       </Grid>
 
-    </Grid> 
-  )  
+    </Grid>
+  )
 }
 

@@ -12,7 +12,8 @@ interface Props {
   setDate: any;
   listOfTime: any;
 }
-const DatePicker = ({setDate, listOfTime}: Props) => {
+
+const DatePicker = ({ setDate, listOfTime }: Props) => {
   const nav = useNavigate();
   const [dates, setDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
@@ -26,18 +27,63 @@ const DatePicker = ({setDate, listOfTime}: Props) => {
   const docName = useSelector((state: RootState) => state.user.docName);
   const specialist = useSelector((state: RootState) => state.user.specialist);
   const location = useSelector((state: RootState) => state.user.location);
+  const bookingId = useSelector((state: RootState) => state.user.bookingId);
 
 
+  const Loader = () => (
+    <div style={{
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      fontSize: '1.5em',
+      color: '#333',
+      zIndex: 1
+    }}>
+      Loading...
+    </div>
+  );
+
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     const currentDate = moment();
-    const dateRange:any = [];
+    const dateRange: any = [];
 
     for (let i = 1; i <= 7; i++) {
       dateRange.push(moment(currentDate).add(i, 'days').format('YYYY-MM-DD'));
     }
 
     setDates(dateRange);
+    if (bookingId != "" || bookingId != undefined) {
+      const fetchFilterValues = async () => {
+        try {
+          const response = await fetch(`http://localhost:8082/appointment/scheduler-appointments/${bookingId}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          if (!response.ok) {
+            const errorMessage = await response.text(); // Use response.json() if server returns JSON
+            toast.error(errorMessage);
+            setIsLoading(false);
+          } else {
+            const data = await response.json();
+            setPatientName(data?.patientName);
+            setGender(data?.gender);
+            setPhoneNumber(data?.phoneNumber);
+            setAge(data?.age);
+            setIsLoading(false);
+          }
+        } catch (error) {
+          toast.error('Error making POST request:');
+          setIsLoading(false);
+        }
+      }
+      fetchFilterValues();
+    }
   }, []);
 
   const handleDateClick = (date: any) => {
@@ -45,48 +91,66 @@ const DatePicker = ({setDate, listOfTime}: Props) => {
     setDate(date);
   };
 
-  const handleSubmit = async() => {
-    
-    if(docName == "" || hospName == "" || specialist =="" || location == "" || patientName == "" || age == "" || gender == "" || phoneNumber == "" || selectedDate == "" || selectedTime == ""){
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    if (docName == "" || hospName == "" || specialist == "" || location == "" || patientName == "" || age == "" || gender == "" || phoneNumber == "" || selectedDate == "" || selectedTime == "") {
+      setIsLoading(false);
       toast.error("Please Fill all fields")
       return;
     }
-    if(phoneNumber.length != 10){
+    if (phoneNumber.length != 10) {
       toast.error("Incorrect Mobile Number")
       return;
     }
-    const body = {"userName" : userName, "docName" : docName, "hospitalName" : hospName,
-      "specialist" : specialist, "location" : location, "patientName" : patientName, "age" : age, "gender" : gender, "phoneNumber" : phoneNumber,
-      "date" : selectedDate, "time" : selectedTime
+    if (bookingId != "" && bookingId == undefined) {
+
+    } else {
+      const body = {
+        "userName": userName, "docName": docName, "hospitalName": hospName,
+        "specialist": specialist, "location": location, "patientName": patientName, "age": age, "gender": gender, "phoneNumber": phoneNumber,
+        "date": selectedDate, "time": selectedTime
       }
-        try {
-            const response = await fetch('http://localhost:8082/appointment/booking', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(body),
-            });
-        
-            if (!response.ok) {
-                const errorMessage = await response.text(); // Use response.json() if server returns JSON
-                toast.error(errorMessage);
-            } else{
-              const message = await response.text(); // Use response.json() if server returns JSON
-              toast.success(message)
-              nav("/")
-            }
-           
-          } catch (error) {
-            toast.error('Error making POST request:');
-          }
+      try {
+        const response = await fetch('http://localhost:8082/appointment/booking', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+          const errorMessage = await response.text(); // Use response.json() if server returns JSON
+          toast.error(errorMessage);
+          setIsLoading(false);
+        } else {
+          const message = await response.text(); // Use response.json() if server returns JSON
+          toast.success(message)
+          setIsLoading(false);
+          nav("/")
         }
+
+      } catch (error) {
+        toast.error('Error making POST request:');
+      }
+    }
+  }
 
 
 
   return (
     <div className="date-picker">
-      <h2 style={{margin: "0.5rem"}}>{moment(selectedDate).format('MMMM YYYY')}</h2>
+      {isLoading ? <><div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'rgba(255, 255, 255, 0.8)', // Adds a white overlay
+        backdropFilter: 'blur(10px)', // Adjust the blur intensity
+        zIndex: 1,
+      }}></div><Loader /> </> : <div>Content goes here!</div>}
+      <h2 style={{ margin: "0.5rem" }}>{moment(selectedDate).format('MMMM YYYY')}</h2>
       <div className="dates">
         {dates.map((date) => (
           <div
@@ -100,33 +164,34 @@ const DatePicker = ({setDate, listOfTime}: Props) => {
         ))}
       </div>
       <div className="time-slots">
-        {listOfTime?.map((time:any) => (
-           <button className={`date-item ${time === selectedTime ? 'selected' : ''}`}
-           onClick={() => {setSelectedTime(time); }}>{time}</button>
+        {listOfTime?.map((time: any) => (
+          <button className={`date-item ${time === selectedTime ? 'selected' : ''}`}
+            onClick={() => { setSelectedTime(time); }}>{time}</button>
         ))}
       </div>
 
-<Grid xs={6} sx={{display: "flex", flexWrap: "wrap", alignContent: "center", alignItems: "center", marginLeft: "25%"}}>
-      <Grid xs={6}>Patient Name:</Grid><Grid  xs={6}><TextField type='text' onChange={(e:any) => setPatientName(e.target.value)} sx={{minWidth:"100%"}}/></Grid>
-      <Grid xs={6}>Patient Age:</Grid><Grid  xs={6} ><TextField type='number' onChange={(e:any) => setAge(e.target.value)} sx={{minWidth:"100%"}}/></Grid>
-      <Grid  xs={6}>Patient Gender:</Grid><Grid  xs={6}>
-      <FormControl fullWidth>
-  <InputLabel id="demo-simple-select-label">Gender</InputLabel>
-  <Select
-    labelId="demo-simple-select-label"
-    id="demo-simple-select"
-    value={gender}
-    label="Age"
-    onChange={(event:any) => {setGender(event.target.value as string)}}
-  >
-    <MenuItem value={"female"}>Female</MenuItem>
-    <MenuItem value={"male"}>Male</MenuItem>
-    <MenuItem value={"nil"}>Prefer not to Mention</MenuItem>
-  </Select>
-</FormControl>
-</Grid>
+      <Grid xs={6} sx={{ display: "flex", flexWrap: "wrap", alignContent: "center", alignItems: "center", marginLeft: "25%" }}>
+        <Grid xs={6}>Patient Name:</Grid><Grid xs={6}><TextField value={patientName} disabled={patientName != undefined && patientName != "" ? true : false} type='text' onChange={(e: any) => setPatientName(e.target.value)} sx={{ minWidth: "100%" }} /></Grid>
+        <Grid xs={6}>Patient Age:</Grid><Grid xs={6} ><TextField value={age} disabled={age != undefined && age != "" ? true : false} type='number' onChange={(e: any) => setAge(e.target.value)} sx={{ minWidth: "100%" }} /></Grid>
+        <Grid xs={6}>Patient Gender:</Grid><Grid xs={6}>
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">Gender</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={gender}
+              label="Age"
+              disabled={gender != undefined && gender != "" ? true : false}
+              onChange={(event: any) => { setGender(event.target.value as string) }}
+            >
+              <MenuItem value={"female"}>Female</MenuItem>
+              <MenuItem value={"male"}>Male</MenuItem>
+              <MenuItem value={"nil"}>Prefer not to Mention</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
 
-     <Grid  xs={6}> Mobile Number:</Grid><Grid  xs={6}><TextField type='number' sx={{minWidth:"100%"}} onChange={(e:any) => setPhoneNumber(e.target.value)}/><br/></Grid>
+        <Grid xs={6}> Mobile Number:</Grid><Grid xs={6}><TextField value={phoneNumber} disabled={phoneNumber != undefined && phoneNumber != "" ? true : false} type='number' sx={{ minWidth: "100%" }} onChange={(e: any) => setPhoneNumber(e.target.value)} /><br /></Grid>
       </Grid>
       <button className="book-appointment" onClick={handleSubmit}>Book an Appointment</button>
     </div>

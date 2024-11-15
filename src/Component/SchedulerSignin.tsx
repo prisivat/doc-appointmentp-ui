@@ -32,14 +32,30 @@ const SchedulerSignIn: React.FC = () => {
   const [locationSelected, setLocationSelected] = useState<any>("");
   const [hospitalNameFilterList, setHospitalNameFilterList] = useState([]);
   const [hospitalName, setHospitalName] = useState("")
+  const [isLoading, setIsLoading] = useState(false);
+
+  const Loader = () => (
+    <div style={{
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      fontSize: '1.5em',
+      color: '#333',
+      zIndex: 1
+    }}>
+      Loading...
+    </div>
+  );
 
 
   const handleRegisterScheduler = async () => {
-
+    setIsLoading(true);
     if (schedulerPassword == "") {
+      setIsLoading(false);
       toast.error("Please enter Password")
     } else {
-      var body = { hospitalName: hospitalName, location: locationSelected, otp: otpValue ,password : schedulerPassword}
+      var body = { hospitalName: hospitalName, location: locationSelected, otp: otpValue, password: schedulerPassword }
       setSchedulerName(hospitalName + locationSelected)
       dispatch(userDetails({
         schedulerName: hospitalName + locationSelected
@@ -54,10 +70,12 @@ const SchedulerSignIn: React.FC = () => {
         });
 
         if (!response.ok) {
+          setIsLoading(false);
           const errorMessage = await response.text(); // Use response.json() if server returns JSON
           toast.error(errorMessage);
-          
+
         } else {
+          setIsLoading(false);
           setRegisterScheduler(false)
           setEnterOTP(false)
           toast.success("Scheduler Registered Successfully.")
@@ -67,12 +85,14 @@ const SchedulerSignIn: React.FC = () => {
         // const data = await response.json();
         // console.log(data);
       } catch (error) {
+        setIsLoading(false);
         toast.error('Error making POST request:');
       }
     }
   }
 
   const handleOptVerify = async (e: any) => {
+    setIsLoading(true);
     if (otpValue == "") {
       toast.error("Please enter OTP")
     } else {
@@ -111,9 +131,9 @@ const SchedulerSignIn: React.FC = () => {
     }
   }
   const handleRegister = async () => {
-    
+
     setEnterOTP(true)
-    var data = {"hospitalName": hospitalName, "location": locationSelected}
+    var data = { "hospitalName": hospitalName, "location": locationSelected }
     try {
       const response = await fetch('http://localhost:8082/api/scheduler/register-scheduler', {
         method: 'POST',
@@ -125,7 +145,7 @@ const SchedulerSignIn: React.FC = () => {
 
       if (!response.ok) {
         const errorMessage = await response.text();
-        if(errorMessage =="Scheduler already there for this hospital, Please Login"){
+        if (errorMessage == "Scheduler already there for this hospital, Please Login") {
           navigate("/schedulerLogin")
         } // Use response.json() if server returns JSON
         toast.error(errorMessage);
@@ -137,7 +157,7 @@ const SchedulerSignIn: React.FC = () => {
       } else {
         const message = await response.text(); // Use response.json() if server returns JSON
         toast.success("OTP sent to the Hospital Email")
-        
+
       }
 
       // const data = await response.json();
@@ -207,8 +227,8 @@ const SchedulerSignIn: React.FC = () => {
 
           {registerScheduler ? (
             <>
-             {/* schedulerName - autoPopulate, Enter Password */}
-             <div style={{display: "flex", alignItems: "stretch"}}><div className="input-group">
+              {/* schedulerName - autoPopulate, Enter Password */}
+              <div style={{ display: "flex", alignItems: "stretch" }}><div className="input-group">
                 <label htmlFor="text">Scheduler Name</label>
                 <TextField
                   type="text"
@@ -219,31 +239,31 @@ const SchedulerSignIn: React.FC = () => {
                   required
                   style={{ background: "#a0c8dc" }} />
               </div>
-              <div className="input-group">
-                <label htmlFor="text">Password</label>
-                <TextField
-                  type="password"
-                  id="otp"
-                  name="otp"
-                  value={schedulerPassword}
-                  onChange={(e) => {setSchedulerPassword(e.target.value)}}
-                  required
-                  style={{ background: "#a0c8dc" }} />
-              </div>
+                <div className="input-group">
+                  <label htmlFor="text">Password</label>
+                  <TextField
+                    type="password"
+                    id="otp"
+                    name="otp"
+                    value={schedulerPassword}
+                    onChange={(e) => { setSchedulerPassword(e.target.value) }}
+                    required
+                    style={{ background: "#a0c8dc" }} />
+                </div>
                 <Button sx={{ border: "2px solid black", marginLeft: "40%" }} onClick={handleRegisterScheduler}> Register Scheduler</Button></div>
 
             </>
           ) : enterOTP ? (
             <>
               {/* opt */}
-              <div style={{display: "flex", alignItems: "stretch"}}><div className="input-group">
+              <div style={{ display: "flex", alignItems: "stretch" }}><div className="input-group">
                 <label htmlFor="text">OTP sent to your Registered Email</label>
                 <TextField
                   type="text"
                   id="otp"
                   name="otp"
                   value={otpValue}
-                  onChange={(e) => {setOtpValue(e.target.value)}}
+                  onChange={(e) => { setOtpValue(e.target.value) }}
                   required
                   style={{ background: "#a0c8dc" }} />
               </div>
@@ -251,13 +271,13 @@ const SchedulerSignIn: React.FC = () => {
             </>
           ) : (
             <>
-              
-
-               {/* //location, Hospital */}
 
 
+              {/* //location, Hospital */}
 
-               <Grid sx={{marginTop: "1rem", display: "flex", alignContent: "center", alignItems: "center", justifyContent: "center", flexWrap: "wrap"}}>
+
+
+              <Grid sx={{ marginTop: "1rem", display: "flex", alignContent: "center", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
                 <b>Location:</b>
 
                 <FormControl sx={{ m: 1, minWidth: 120 }}>
@@ -282,14 +302,14 @@ const SchedulerSignIn: React.FC = () => {
 
                   <>
 
-                    <Grid sx={{marginTop: "1rem", display: "flex", alignContent: "center", alignItems: "center", justifyContent: "center", flexWrap: "wrap"}}><b>Hospital Name :</b>
+                    <Grid sx={{ marginTop: "1rem", display: "flex", alignContent: "center", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}><b>Hospital Name :</b>
                       <Autocomplete
                         id="combo-box-demo"
                         options={hospitalNameFilterList}
                         getOptionLabel={(option: any) => option}
-                        sx={{ width: 300, background: "white",marginTop: "1rem", }}
+                        sx={{ width: 300, background: "white", marginTop: "1rem", }}
                         value={hospitalName}
-                        onChange={(event, newValue:any) => setHospitalName(newValue)}
+                        onChange={(event, newValue: any) => setHospitalName(newValue)}
                         renderInput={(params) => (
                           <TextField
                             {...params}
@@ -301,7 +321,7 @@ const SchedulerSignIn: React.FC = () => {
                     </Grid></>
                 )}
 
-                <Button  sx={{background: "#067492 !important", color: "white", marginTop: "1rem"}} onClick={handleRegister} >Create Scheduler</Button>
+                <Button sx={{ background: "#067492 !important", color: "white", marginTop: "1rem" }} onClick={handleRegister} >Create Scheduler</Button>
               </Grid>
 
             </>
@@ -309,7 +329,7 @@ const SchedulerSignIn: React.FC = () => {
 
 
         </div>
-        
+
       </div>
     </>
   );

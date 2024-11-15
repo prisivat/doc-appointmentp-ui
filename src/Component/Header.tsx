@@ -16,13 +16,13 @@ const styleCommon = {
 
 
 const Headers = () => {
- 
+
   const userName = useSelector((state: RootState) => state.user.userName);
   const dispatch = useDispatch();
   const [body, setBody] = useState<any>();
   const [openModel, setOpenModel] = useState(false);
   const navigate = useNavigate();
-  
+
   const handleLogOut = () => {
     dispatch(userDetails({
       userName: null
@@ -33,9 +33,9 @@ const Headers = () => {
     navigate("/bookingHistory")
   }
 
-  const handleContact =() => {
+  const handleContact = () => {
     setOpenModel(true);
-    const val = <div><div>Mobile : 9834253647/ 648 </div><br/><div>Mail: easyMed@gmail.com</div></div>
+    const val = <div><div>Mobile : 9834253647/ 648 </div><br /><div>Mail: easyMed@gmail.com</div></div>
     setBody(val)
   }
 
@@ -43,7 +43,7 @@ const Headers = () => {
     navigate("/register")
   }
 
-  const handleHome =() => {
+  const handleHome = () => {
     navigate("/");
   }
 
@@ -57,8 +57,8 @@ const Headers = () => {
   return (
     <Grid container className="navbar">
       {openModel && (
-                          <Model body={body} title="EasyMed Contact Details" opeModel={openModel} setOpeModel={setOpenModel} isHospDtls={false} iscalendar={false} />
-                        )}
+        <Model body={body} title="EasyMed Contact Details" opeModel={openModel} setOpeModel={setOpenModel} isHospDtls={false} iscalendar={false} />
+      )}
 
       <Grid item xs={3}>
         <div style={{ color: "#0799c1", fontSize: "50px", marginRight: "100px" }}>
@@ -75,9 +75,9 @@ const Headers = () => {
         <ul className="nav-links">
           <li><button onClick={handleScheduler} className="Header-button">Scheduler Login</button></li>
         </ul>
-        {userName == "" || userName == null? (
+        {userName == "" || userName == null ? (
           <>
-            <div style={{marginRight:"2rem"}}>
+            <div style={{ marginRight: "2rem" }}>
               <button onClick={handleLogin} className="Header-button">Login</button>
             </div>
 
@@ -89,19 +89,19 @@ const Headers = () => {
         ) :
           (
             <>
-            <div style={{marginRight:"2rem"}}>
-            <button onClick={handleBookingHistory} className="Header-button">Booking History</button>
-            </div>
-            <div className="login-btn">
-              <button onClick={handleLogOut} className="Header-button">Log out</button>
-            </div>
-            
-          </>
+              <div style={{ marginRight: "2rem" }}>
+                <button onClick={handleBookingHistory} className="Header-button">Booking History</button>
+              </div>
+              <div className="login-btn">
+                <button onClick={handleLogOut} className="Header-button">Log out</button>
+              </div>
+
+            </>
           )}
       </Grid>
       <Grid xs={2} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
         <div style={{ right: 0, display: "flex", alignItems: "center" }}>
-          {userName != null && userName != "" ? userName : "Unknown User"}<Avatar sx={{ marginLeft: "10px", marginRight: "10px" }} /> 
+          {userName != null && userName != "" ? userName : "Unknown User"}<Avatar sx={{ marginLeft: "10px", marginRight: "10px" }} />
         </div>
       </Grid>
 

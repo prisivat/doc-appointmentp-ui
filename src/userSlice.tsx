@@ -8,6 +8,7 @@ interface UserState {
   location?: string,
   specialist?: string
   schedulerName?:any;
+  bookingId?:any;
 }
 
 const initialState: UserState = {
@@ -17,7 +18,8 @@ const initialState: UserState = {
   hospitalName: "",
   location: '',
   specialist: "",
-  schedulerName:""
+  schedulerName:"",
+  bookingId:"",
 };
 
 export const userSlice = createSlice({
@@ -42,6 +44,7 @@ export const userSlice = createSlice({
           state.docName = action.payload.docName;
           state.location = action.payload.location;         
           state.specialist = action.payload.specialist;
+          state.bookingId = action.payload.bookingId;
         }
     }
 });

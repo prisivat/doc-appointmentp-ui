@@ -9,80 +9,95 @@ import { styled } from '@mui/material/styles';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
 
-const BootstrapDialog = styled(Dialog)(({ theme:any }) => ({
-    '& .MuiDialogContent-root': {
-      padding: "50px",
-    },
-    '& .MuiDialogActions-root': {
-      padding: "50px",
-    },
-  }));
+const BootstrapDialog = styled(Dialog)(({ theme: any }) => ({
+  '& .MuiDialogContent-root': {
+    padding: "50px",
+  },
+  '& .MuiDialogActions-root': {
+    padding: "50px",
+  },
+}));
 
-  interface Props {
-    opeModel: any;
-    setOpeModel: any;
-    title: any;
-    isHospDtls:any;
-    iscalendar:any;
-    body?:any;
-  }
-const Model = ({opeModel, setOpeModel, title,isHospDtls,body,iscalendar}: Props) => {
-    const [open, setOpen] = React.useState(opeModel);
-    const hospitalNameMail =  title.replace(/ /g, '')
+interface Props {
+  opeModel: any;
+  setOpeModel: any;
+  title: any;
+  isHospDtls: any;
+  iscalendar: any;
+  body?: any;
+}
+const Model = ({ opeModel, setOpeModel, title, isHospDtls, body, iscalendar }: Props) => {
+  const [open, setOpen] = React.useState(opeModel);
+  const hospitalNameMail = title.replace(/ /g, '')
+  const [isLoading, setIsLoading] = React.useState(false)
 
-    const handleClickOpen = () => {
-      setOpen(true);
-    };
-    const handleClose = () => {
-      setOpen(false);
-      setOpeModel(false)
-    };
-    
-return(
+  const Loader = () => (
+    <div style={{
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      fontSize: '1.5em',
+      color: '#333',
+      zIndex: 1
+    }}>
+      Loading...
+    </div>
+  );
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+    setOpeModel(false)
+  };
+
+  return (
     <React.Fragment>
-        <BootstrapDialog
-      onClose={handleClose}
-      aria-labelledby="customized-dialog-title"
-      open={open}
-      PaperProps={{
-        style: {
+      <BootstrapDialog
+        onClose={handleClose}
+        aria-labelledby="customized-dialog-title"
+        open={open}
+        PaperProps={{
+          style: {
             backgroundColor: 'lightblue',
-          boxShadow: 'none',
-        },
-      }}
-      BackdropProps={{
-        style: {
-          backgroundColor: 'transparent', // Makes the backdrop (behind the modal) transparent
-        },
-      }}
-    >
-      <DialogTitle sx={{ m: 0, p: 2, fontWeight: 'bold'}} id="customized-dialog-title">
-       {title}
-      </DialogTitle>
-      <IconButton
-        aria-label="close"
-        onClick={handleClose}
-        sx={{
-          position: 'absolute',
-          right: 8,
-          top: 8,
-          color: (theme) => theme.palette.grey[500],
+            boxShadow: 'none',
+          },
+        }}
+        BackdropProps={{
+          style: {
+            backgroundColor: 'transparent', // Makes the backdrop (behind the modal) transparent
+          },
         }}
       >
-        <CloseIcon />
-      </IconButton>
-      <DialogContent dividers>
-        {isHospDtls ?
-        (<Typography gutterBottom>
-          <div style = {{display: "flex"}}><PhoneInTalkIcon/>   Contact : 044 - 23143532,  044-23139232<br/></div>
-          <div style = {{display: "flex"}}> <MailOutlineIcon/>   Email: {hospitalNameMail}@gmail.com</div>
-        </Typography>) :
-        
-        (<div>{body}</div>)
-        } 
-      </DialogContent>
-     </BootstrapDialog>
-  </React.Fragment>
-)
+        <DialogTitle sx={{ m: 0, p: 2, fontWeight: 'bold' }} id="customized-dialog-title">
+          {title}
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent dividers>
+          {isHospDtls ?
+            (<Typography gutterBottom>
+              <div style={{ display: "flex" }}><PhoneInTalkIcon />   Contact : 044 - 23143532,  044-23139232<br /></div>
+              <div style={{ display: "flex" }}> <MailOutlineIcon />   Email: {hospitalNameMail}@gmail.com</div>
+            </Typography>) :
+
+            (<div>{body}</div>)
+          }
+        </DialogContent>
+      </BootstrapDialog>
+    </React.Fragment>
+  )
 }
 export default Model;

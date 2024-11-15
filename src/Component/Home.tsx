@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import Headers from './Header'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useSelector } from 'react-redux';
-import { RootState } from '../store'; 
+import { RootState } from '../store';
 import { HospitalDetails } from './HospitalDetails';
 const Home: React.FC = () => {
 
@@ -34,12 +34,27 @@ const Home: React.FC = () => {
   const userName = useSelector((state: RootState) => state.user.userName);
   const [showLocation, setShowLocation] = useState(true);
   const [hospDtlsByLoc, setHospDtlsByLoc] = useState<any>([]);
-  const [spltNameList, setSpltNameList] = useState<any> ({})
-  
+  const [spltNameList, setSpltNameList] = useState<any>({})
+  const [isLoading, setIsLoading] = useState(false);
+
+  const Loader = () => (
+    <div style={{
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      fontSize: '1.5em',
+      color: '#333',
+      zIndex: 1
+    }}>
+      Loading...
+    </div>
+  );
   useEffect(() => {
+    setIsLoading(true);
     const fetchDetails = async () => {
       try {
-        const response = await fetch('http://localhost:8082/hospital/locations', {
+        const response = await fetch('http://localhost:3002/hospital/locations', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -47,7 +62,9 @@ const Home: React.FC = () => {
         });
         const data = await response.json();
         setLocationDetails(data);
+        setIsLoading(false);
       } catch (error) {
+        setIsLoading(false);
         toast.error('Error making POST request:');
       }
     }
@@ -59,35 +76,9 @@ const Home: React.FC = () => {
     setSelectedLocation(e)
   }
 
-useEffect(() => {
-  const fetchHospitalDtls = async () => {
-  try {
-    const response = await fetch('http://localhost:8082/hospital/hospitalDetails', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-        const errorMessage = await response.text(); // Use response.json() if server returns JSON
-        toast.error(errorMessage);
-    }
-    const value = await response.json()
-    setHospDtlsByLoc(value);
-
-  } catch (error) {
-    toast.error('Error making POST request:');
-  }
-  getSplDtlsByLoc();
-}
-fetchHospitalDtls()
-},[])
-
-  const handleSearchLocation = async (e: any) => {
-    if(selectedLocation.length == 0){
-      toast.warning("Please select location")
-    } else{
+  useEffect(() => {
+    setIsLoading(true);
+    const fetchHospitalDtls = async () => {
       try {
         const response = await fetch('http://localhost:8082/hospital/hospitalDetails', {
           method: 'GET',
@@ -95,53 +86,63 @@ fetchHospitalDtls()
             'Content-Type': 'application/json',
           },
         });
-    
+
         if (!response.ok) {
-            const errorMessage = await response.text(); // Use response.json() if server returns JSON
-            toast.error(errorMessage);
+          setIsLoading(false);
+          const errorMessage = await response.text(); // Use response.json() if server returns JSON
+          toast.error(errorMessage);
         }
         const value = await response.json()
         setHospDtlsByLoc(value);
-    
+        setIsLoading(false);
+
       } catch (error) {
+        setIsLoading(false);
         toast.error('Error making POST request:');
       }
-      getSplDtlsByLoc();
+    }
+    fetchHospitalDtls()
+  }, [])
+
+  const handleSearchLocation = async (e: any) => {
+    setIsLoading(true);
+    if (selectedLocation.length == 0) {
+      toast.warning("Please select location")
+      setIsLoading(false);
+    } else {
+      try {
+        const response = await fetch('http://localhost:8082/hospital/hospitalDetails', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          const errorMessage = await response.text(); // Use response.json() if server returns JSON
+          toast.error(errorMessage);
+        }
+        const value = await response.json()
+        setHospDtlsByLoc(value);
+        setIsLoading(false);
+
+      } catch (error) {
+        toast.error('Error making POST request:');
+        setIsLoading(false);
+      }
+
     }
   }
 
-  const getSplDtlsByLoc = async () => {
-    // try {
-    //   const response = await fetch('http://localhost:8082/hospital/specialistName', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(selectedLocation),
-    //   });
-  
-    //   if (!response.ok) {
-    //       const errorMessage = await response.text(); // Use response.json() if server returns JSON
-    //       toast.error(errorMessage);
-    //   }
-    //   setSpltNameList( await response.json());
-    //   setShowLocation(false)
-  
-    //   // const data = await response.json();
-    //   // .log(data);
-    // } catch (error) {
-    //   console.error('Error making POST request:', error);
-    // }
-  }
 
   return (
     <>
-    <div style={bodyStyle}>
-      <div >
+      <div style={bodyStyle}>
+        <div >
 
-      
-      <Headers />
-      {/* {  showLocation ?  (
+
+          <Headers />
+          {/* {  showLocation ?  (
       <Grid container xs={12} sx={containerStyle}>
         <Autocomplete
           multiple
@@ -162,15 +163,15 @@ fetchHospitalDtls()
         <Button onClick={handleSearchLocation} sx={{background: "#067492 !important", color: "white"}}><ArrowForwardIcon /></Button>
       </Grid>
       ) : ( */}
-      {/* <Chatbot/> */}
-          <HospitalDetails hospDtlsByLoc={hospDtlsByLoc} spltNameList={spltNameList} locationList={locationDetails}/>
-        
+          {/* <Chatbot/> */}
+          <HospitalDetails hospDtlsByLoc={hospDtlsByLoc} spltNameList={spltNameList} locationList={locationDetails} />
 
-      {/* )} */}
-      </div>
+
+          {/* )} */}
+        </div>
       </div>
     </>
-  ) 
+  )
 }
 
 export default Home;
