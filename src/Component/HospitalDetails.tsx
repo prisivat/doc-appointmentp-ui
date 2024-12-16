@@ -70,10 +70,11 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
     if (locationSelected == "") {
       setIsLoading(false);
       toast.error("Please select Location");
-    } else if ((filterValues.specialist.length == 0 || filterValues.hospitalName.length == 0) && locationSelected != "") {
-      setIsLoading(false);
-      toast.error("Please Select both Speaclist and Hospital Name")
-    } else {
+    // } else if ((filterValues.specialist.length == 0 || filterValues.hospitalName.length == 0) && locationSelected != "") {
+    //   setIsLoading(false);
+    //   toast.error("Please Select both Speaclist and Hospital Name")
+    } 
+    else {
 
       var final: any = {};
       final.cost = parseInt(filterValues.cost)
@@ -82,7 +83,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
       final.specialist = filterValues.specialist
 
       try {
-        const response = await fetch('http://localhost:8082/hospital/filteredDtls', {
+        const response = await fetch('http://localhost:9000/hospital/filteredDtls', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -156,7 +157,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
     var location = loc;
     const fetchFilterValues = async () => {
       try {
-        const response = await fetch(`http://localhost:8082/hospital/filterDtls/${location}`, {
+        const response = await fetch(`http://localhost:9000/hospital/filterDtls/${location}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

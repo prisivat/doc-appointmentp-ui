@@ -58,7 +58,7 @@ const LoginPage: React.FC = () => {
         userName: formData.username
       }));
       try {
-        const response = await fetch('http://localhost:8082/api/patient/login', {
+        const response = await fetch('http://localhost:9000/api/patient/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ const LoginPage: React.FC = () => {
         userName: formData.username
       }));
       try {
-        const response = await fetch('http://localhost:8082/api/patient/verify-otp', {
+        const response = await fetch('http://localhost:9000/api/patient/verify-otp', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ const LoginPage: React.FC = () => {
   const handleForgotPasswordEmail = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:8082/api/patient/forgot-password', {
+      const response = await fetch('http://localhost:9000/api/patient/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -191,7 +191,7 @@ const LoginPage: React.FC = () => {
     if (resetPassword.confirmPassword == resetPassword.password) {
       const data = { token: resetPassword.token, newPassword: resetPassword.password }
       try {
-        const response = await fetch('http://localhost:8082/api/patient/reset-password', {
+        const response = await fetch('http://localhost:9000/api/patient/reset-password', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -236,7 +236,7 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
     const data = { "email": forgotUserEmail }
     try {
-      const response = await fetch('http://localhost:8082/api/patient/forgot-username', {
+      const response = await fetch('http://localhost:9000/api/patient/forgot-username', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

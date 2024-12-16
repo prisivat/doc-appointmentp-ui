@@ -57,7 +57,7 @@ function BookingHistory() {
     setEvent([{ title: "AZUL +5", start: val }])
     const bookingHistory = async () => {
       try {
-        const response = await fetch('http://localhost:8082/appointment/booking-history', {
+        const response = await fetch('http://localhost:9000/appointment/booking-history', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

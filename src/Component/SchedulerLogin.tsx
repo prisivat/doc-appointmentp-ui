@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import SchedulerHeader from './SchedulerHeader';
 import { hospitalDetails } from '../userSlice';
 import { useDispatch } from 'react-redux';
+import logo from "../assets/logo.png"
+import userSlice, { schedulerDetails, userDetails } from "../userSlice"
+
 
 
 
@@ -45,8 +48,11 @@ const SchedulerLogin: React.FC = () => {
       toast.error("Please enter OTP")
     } else {
       var body = { hospitalName: hospitalName, location: locationSelected, otp: otpValue }
+      dispatch(schedulerDetails({
+              schedulerName: hospitalName.replace(" ", "") + locationSelected
+            }));
       try {
-        const response = await fetch('http://localhost:8082/api/scheduler/verify-otp', {
+        const response = await fetch('http://localhost:9000/api/scheduler/verify-otp', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -87,7 +93,7 @@ const SchedulerLogin: React.FC = () => {
     setIsLoading(true);
     const fetchDetails = async () => {
       try {
-        const response = await fetch('http://localhost:8082/hospital/locations', {
+        const response = await fetch('http://localhost:9000/hospital/locations', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -110,7 +116,7 @@ const SchedulerLogin: React.FC = () => {
     var location = locationSelected;
     const fetchFilterValues = async () => {
       try {
-        const response = await fetch(`http://localhost:8082/hospital/filterDtls/${location}`, {
+        const response = await fetch(`http://localhost:9000/hospital/filterDtls/${location}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -147,7 +153,7 @@ const SchedulerLogin: React.FC = () => {
 
     var body = { hospitalName: hospitalName, location: locationSelected, password: schedulerPassword }
     try {
-      const response = await fetch(`http://localhost:8082/api/scheduler/scheduler-login`, {
+      const response = await fetch(`http://localhost:9000/api/scheduler/scheduler-login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -180,9 +186,14 @@ const SchedulerLogin: React.FC = () => {
   return (
     <div>
       <SchedulerHeader />
-      <div className="login-container" >
+      <div className="login-container" style={{    width: "200%"}} >
+        <header className="login-header">
+          <img style={{ width: "5rem" }} src={logo} alt="logo" />
+          <h1 className="hospital-name">{enterOTP ? "Enter OTP":  "Log In"}</h1>
+        </header>
+        <div className="login-box"></div>
         {enterOTP ? (
-          <div style={{ display: "flex", alignItems: "stretch" }}><div className="input-group">
+          <div style={{ display: "flex", alignItems: "stretch", flexDirection: "column" }}><div className="input-group">
             <label htmlFor="text">OTP sent to your Registered Email</label>
             <TextField
               type="text"
@@ -191,9 +202,10 @@ const SchedulerLogin: React.FC = () => {
               value={otpValue}
               onChange={(e) => { setOtpValue(e.target.value) }}
               required
-              style={{ background: "#a0c8dc", height: "2rem" }} />
+              style={{ background: "#a0c8dc",  }} />
+               <Button sx={{ border: "2px solid black", marginLeft: "40%", marginTop: "2%" }} onClick={handleOptVerify}>Verify OTP</Button>
           </div>
-            <Button sx={{ border: "2px solid black", marginLeft: "40%" }} onClick={handleOptVerify}>Verify OTP</Button></div>
+           </div>
 
         ) : (
           <Grid sx={{ display: "flex", alignItems: "stretch", flexDirection: "column" }}>

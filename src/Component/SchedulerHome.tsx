@@ -16,7 +16,7 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 
 const SchedulerHome: React.FC = () => {
 
-  const [schedulerDetails, setScedulerDetails] = useState([{}]);
+  const [schedulerDetails, setScedulerDetails] = useState([{location: "", hospitalName:""}]);
   const [docNameList, setDocNameList] = useState([]);
   const hospitalName = useSelector((state: RootState) => state.user.hospitalName);
   const location = useSelector((state: RootState) => state.user.location);
@@ -45,7 +45,7 @@ const SchedulerHome: React.FC = () => {
         // const body = {hospitalName: hospitalName, location: location, date: new Date()};
         var date = new Date().toISOString().split('T')[0];;
         const body = { hospitalName: "Apollo Hospital", location: "Chennai", date: date };
-        const response = await fetch('http://localhost:8082/appointment/scheduler-total-appointments', {
+        const response = await fetch('http://localhost:9000/appointment/scheduler-total-appointments', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -87,8 +87,8 @@ const SchedulerHome: React.FC = () => {
     setSelectedDocName(selected);
     setScedulerDetails([])
     try {
-      const body = { hospitalName: "Apollo Hospital", location: "Chennai", docName: selected };
-      const response = await fetch('http://localhost:8082/appointment/scheduler-filter', {
+      const body = { hospitalName: schedulerDetails[0].hospitalName, location: schedulerDetails[0].location, docName: selected == "" ? "ALL" : selected };
+      const response = await fetch('http://localhost:9000/appointment/scheduler-filter', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,8 +118,9 @@ const SchedulerHome: React.FC = () => {
     setIsLoading(true);
     try {
       const formattedDate = newValue ? dayjs(newValue).format('YYYY-MM-DD') : '';
-      const body = { hospitalName: "Apollo Hospital", location: "Chennai", date: formattedDate };
-      const response = await fetch('http://localhost:8082/appointment/scheduler-appointments', {
+      setSelectedDocName("")
+      const body = { hospitalName: schedulerDetails[0].hospitalName, location:  schedulerDetails[0].location, date: formattedDate };
+      const response = await fetch('http://localhost:9000/appointment/scheduler-appointments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

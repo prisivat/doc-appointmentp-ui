@@ -7,6 +7,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { HospitalDetails } from './HospitalDetails';
+import Chatbot from './Chatbot';
 const Home: React.FC = () => {
 
   const containerStyle = {
@@ -54,7 +55,7 @@ const Home: React.FC = () => {
     setIsLoading(true);
     const fetchDetails = async () => {
       try {
-        const response = await fetch('http://localhost:3002/hospital/locations', {
+        const response = await fetch('http://localhost:9000/hospital/locations', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -80,7 +81,7 @@ const Home: React.FC = () => {
     setIsLoading(true);
     const fetchHospitalDtls = async () => {
       try {
-        const response = await fetch('http://localhost:8082/hospital/hospitalDetails', {
+        const response = await fetch('http://localhost:9000/hospital/hospitalDetails', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -111,7 +112,7 @@ const Home: React.FC = () => {
       setIsLoading(false);
     } else {
       try {
-        const response = await fetch('http://localhost:8082/hospital/hospitalDetails', {
+        const response = await fetch('http://localhost:9000/hospital/hospitalDetails', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -165,8 +166,8 @@ const Home: React.FC = () => {
       ) : ( */}
           {/* <Chatbot/> */}
           <HospitalDetails hospDtlsByLoc={hospDtlsByLoc} spltNameList={spltNameList} locationList={locationDetails} />
-
-
+            
+<Chatbot/>
           {/* )} */}
         </div>
       </div>

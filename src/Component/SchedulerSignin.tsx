@@ -57,11 +57,11 @@ const SchedulerSignIn: React.FC = () => {
     } else {
       var body = { hospitalName: hospitalName, location: locationSelected, otp: otpValue, password: schedulerPassword }
       setSchedulerName(hospitalName + locationSelected)
-      dispatch(userDetails({
-        schedulerName: hospitalName + locationSelected
+      dispatch(schedulerDetails({
+        schedulerName: hospitalName.replace(" ", "") + locationSelected
       }));
       try {
-        const response = await fetch('http://localhost:8082/api/scheduler/save-scheduler', {
+        const response = await fetch('http://localhost:9000/api/scheduler/save-scheduler', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -79,6 +79,7 @@ const SchedulerSignIn: React.FC = () => {
           setRegisterScheduler(false)
           setEnterOTP(false)
           toast.success("Scheduler Registered Successfully.")
+
           navigate("/schedulerHome")
         }
 
@@ -102,7 +103,7 @@ const SchedulerSignIn: React.FC = () => {
         schedulerName: hospitalName + locationSelected
       }));
       try {
-        const response = await fetch('http://localhost:8082/api/scheduler/verify-otp', {
+        const response = await fetch('http://localhost:9000/api/scheduler/verify-otp', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -135,7 +136,7 @@ const SchedulerSignIn: React.FC = () => {
     setEnterOTP(true)
     var data = { "hospitalName": hospitalName, "location": locationSelected }
     try {
-      const response = await fetch('http://localhost:8082/api/scheduler/register-scheduler', {
+      const response = await fetch('http://localhost:9000/api/scheduler/register-scheduler', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -172,7 +173,7 @@ const SchedulerSignIn: React.FC = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await fetch('http://localhost:8082/hospital/locations', {
+        const response = await fetch('http://localhost:9000/hospital/locations', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -191,7 +192,7 @@ const SchedulerSignIn: React.FC = () => {
     var location = locationSelected;
     const fetchFilterValues = async () => {
       try {
-        const response = await fetch(`http://localhost:8082/hospital/filterDtls/${location}`, {
+        const response = await fetch(`http://localhost:9000/hospital/filterDtls/${location}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -221,14 +222,15 @@ const SchedulerSignIn: React.FC = () => {
       <div className="login-container" >
         <header className="login-header">
           <img style={{ width: "5rem" }} src={logo} alt="logo" />
-          <h1 className="hospital-name">{!enterOTP ? "Login" : "Enter OTP"}</h1>
+          <h1 className="hospital-name">{enterOTP ? "Enter OTP": registerScheduler? "Sign In" : "Log In"}</h1>
         </header>
         <div className="login-box">
 
           {registerScheduler ? (
             <>
               {/* schedulerName - autoPopulate, Enter Password */}
-              <div style={{ display: "flex", alignItems: "stretch" }}><div className="input-group">
+              <div style={{ display: "flex", alignItems: "stretch", flexDirection: "column" }}>
+                <div className="input-group">
                 <label htmlFor="text">Scheduler Name</label>
                 <TextField
                   type="text"
@@ -238,7 +240,7 @@ const SchedulerSignIn: React.FC = () => {
                   disabled={true}
                   required
                   style={{ background: "#a0c8dc" }} />
-              </div>
+              </div> 
                 <div className="input-group">
                   <label htmlFor="text">Password</label>
                   <TextField
@@ -256,7 +258,7 @@ const SchedulerSignIn: React.FC = () => {
           ) : enterOTP ? (
             <>
               {/* opt */}
-              <div style={{ display: "flex", alignItems: "stretch" }}><div className="input-group">
+              <div style={{ display: "flex", alignItems: "stretch", flexDirection: "column" }}><div className="input-group">
                 <label htmlFor="text">OTP sent to your Registered Email</label>
                 <TextField
                   type="text"
@@ -266,8 +268,9 @@ const SchedulerSignIn: React.FC = () => {
                   onChange={(e) => { setOtpValue(e.target.value) }}
                   required
                   style={{ background: "#a0c8dc" }} />
+                   <Button sx={{ border: "2px solid black", marginLeft: "30%", marginTop: "5%" }} onClick={handleOptVerify}>Verify OTP</Button>
               </div>
-                <Button sx={{ border: "2px solid black", marginLeft: "40%" }} onClick={handleOptVerify}>Verify OTP</Button></div>
+               </div>
             </>
           ) : (
             <>

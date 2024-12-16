@@ -18,10 +18,12 @@ const styleCommon = {
 const Headers = () => {
 
   const userName = useSelector((state: RootState) => state.user.userName);
+  const schedulerName = useSelector((state: RootState) => state.user.schedulerName);
   const dispatch = useDispatch();
   const [body, setBody] = useState<any>();
   const [openModel, setOpenModel] = useState(false);
   const navigate = useNavigate();
+  const schedulerPath = (window.location.pathname).includes("scheduler") ? true : false;
 
   const handleLogOut = () => {
     dispatch(userDetails({
@@ -53,6 +55,31 @@ const Headers = () => {
 
   const handleScheduler = () => {
     navigate("/schedulerLogin")
+  }
+
+  const handleChatBot = async () => {
+    const body = {"query": "what is fever"}
+    try {
+      const response = await fetch('http://127.0.0.1:5000/ask', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body:JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.text(); // Use response.json() if server returns JSON
+        // toast.error(errorMessage);
+      }
+      const value = await response.json()
+      // setHospDtlsByLoc(value);
+      // setIsLoading(false);
+
+    } catch (error) {
+      // toast.error('Error making POST request:');
+      // setIsLoading(false);
+    }
   }
   return (
     <Grid container className="navbar">
@@ -101,7 +128,7 @@ const Headers = () => {
       </Grid>
       <Grid xs={2} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
         <div style={{ right: 0, display: "flex", alignItems: "center" }}>
-          {userName != null && userName != "" ? userName : "Unknown User"}<Avatar sx={{ marginLeft: "10px", marginRight: "10px" }} />
+          {(userName != null && userName != "" && !schedulerPath) ? userName :(schedulerPath && schedulerName != null && schedulerName != "") ? schedulerName : "Unknown User"}<Avatar sx={{ marginLeft: "10px", marginRight: "10px" }} />
         </div>
       </Grid>
 

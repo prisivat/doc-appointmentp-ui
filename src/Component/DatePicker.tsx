@@ -19,6 +19,7 @@ const DatePicker = ({ setDate, listOfTime }: Props) => {
   const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
   const [selectedTime, setSelectedTime] = useState("")
   const [patientName, setPatientName] = useState("");
+  const [edit, setEdit] = useState(false);
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -56,10 +57,10 @@ const DatePicker = ({ setDate, listOfTime }: Props) => {
     }
 
     setDates(dateRange);
-    if (bookingId != "" || bookingId != undefined) {
+    if (bookingId != "" && bookingId != undefined) {
       const fetchFilterValues = async () => {
         try {
-          const response = await fetch(`http://localhost:8082/appointment/scheduler-appointments/${bookingId}`, {
+          const response = await fetch(`http://localhost:9000/appointment/scheduler-appointments/${bookingId}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -71,6 +72,7 @@ const DatePicker = ({ setDate, listOfTime }: Props) => {
             setIsLoading(false);
           } else {
             const data = await response.json();
+            setEdit(true);
             setPatientName(data?.patientName);
             setGender(data?.gender);
             setPhoneNumber(data?.phoneNumber);
@@ -83,6 +85,8 @@ const DatePicker = ({ setDate, listOfTime }: Props) => {
         }
       }
       fetchFilterValues();
+    } else {
+      setIsLoading(false);
     }
   }, []);
 
@@ -99,11 +103,41 @@ const DatePicker = ({ setDate, listOfTime }: Props) => {
       return;
     }
     if (phoneNumber.length != 10) {
+      setIsLoading(false);
       toast.error("Incorrect Mobile Number")
       return;
     }
-    if (bookingId != "" && bookingId == undefined) {
+    if (bookingId != "" && bookingId != undefined) { 
+      
+      const body = {
+        "userName": userName, "docName": docName, "hospitalName": hospName,
+        "specialist": specialist, "location": location, "patientName": patientName, "age": age, "gender": gender, "phoneNumber": phoneNumber,
+        "date": selectedDate, "time": selectedTime, "bookingId": bookingId
+      }
+      try {
+        const response = await fetch('http://localhost:9000/appointment/reschedule-booking', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        });
 
+        if (!response.ok) {
+          const errorMessage = await response.text(); // Use response.json() if server returns JSON
+          toast.error(errorMessage);
+          setIsLoading(false);
+        } else {
+          const message = await response.text(); // Use response.json() if server returns JSON
+          toast.success(message)
+          setIsLoading(false);
+          nav("/")
+        }
+
+      } catch (error) {
+        toast.error('Error making POST request:');
+      }
+      setIsLoading(false);
     } else {
       const body = {
         "userName": userName, "docName": docName, "hospitalName": hospName,
@@ -111,7 +145,7 @@ const DatePicker = ({ setDate, listOfTime }: Props) => {
         "date": selectedDate, "time": selectedTime
       }
       try {
-        const response = await fetch('http://localhost:8082/appointment/booking', {
+        const response = await fetch('http://localhost:9000/appointment/booking', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -171,8 +205,8 @@ const DatePicker = ({ setDate, listOfTime }: Props) => {
       </div>
 
       <Grid xs={6} sx={{ display: "flex", flexWrap: "wrap", alignContent: "center", alignItems: "center", marginLeft: "25%" }}>
-        <Grid xs={6}>Patient Name:</Grid><Grid xs={6}><TextField value={patientName} disabled={patientName != undefined && patientName != "" ? true : false} type='text' onChange={(e: any) => setPatientName(e.target.value)} sx={{ minWidth: "100%" }} /></Grid>
-        <Grid xs={6}>Patient Age:</Grid><Grid xs={6} ><TextField value={age} disabled={age != undefined && age != "" ? true : false} type='number' onChange={(e: any) => setAge(e.target.value)} sx={{ minWidth: "100%" }} /></Grid>
+        <Grid xs={6}>Patient Name:</Grid><Grid xs={6}><TextField value={patientName} disabled={edit ? true : false} type='text' onChange={(e: any) => setPatientName(e.target.value)} sx={{ minWidth: "100%" }} /></Grid>
+        <Grid xs={6}>Patient Age:</Grid><Grid xs={6} ><TextField value={age} disabled={edit ? true : false} type='number' onChange={(e: any) => setAge(e.target.value)} sx={{ minWidth: "100%" }} /></Grid>
         <Grid xs={6}>Patient Gender:</Grid><Grid xs={6}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Gender</InputLabel>
@@ -181,7 +215,7 @@ const DatePicker = ({ setDate, listOfTime }: Props) => {
               id="demo-simple-select"
               value={gender}
               label="Age"
-              disabled={gender != undefined && gender != "" ? true : false}
+              disabled={edit ? true : false}
               onChange={(event: any) => { setGender(event.target.value as string) }}
             >
               <MenuItem value={"female"}>Female</MenuItem>
@@ -191,7 +225,7 @@ const DatePicker = ({ setDate, listOfTime }: Props) => {
           </FormControl>
         </Grid>
 
-        <Grid xs={6}> Mobile Number:</Grid><Grid xs={6}><TextField value={phoneNumber} disabled={phoneNumber != undefined && phoneNumber != "" ? true : false} type='number' sx={{ minWidth: "100%" }} onChange={(e: any) => setPhoneNumber(e.target.value)} /><br /></Grid>
+        <Grid xs={6}> Mobile Number:</Grid><Grid xs={6}><TextField value={phoneNumber} disabled={edit ? true : false} type='number' sx={{ minWidth: "100%" }} onChange={(e: any) => setPhoneNumber(e.target.value)} /><br /></Grid>
       </Grid>
       <button className="book-appointment" onClick={handleSubmit}>Book an Appointment</button>
     </div>

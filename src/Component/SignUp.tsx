@@ -78,7 +78,7 @@ const SignUp = () => {
             toast.error("Please fill all the Fields")
         } else {
             try {
-                const response = await fetch('http://localhost:8082/api/patient/sign-up', {
+                const response = await fetch('http://localhost:9000/api/patient/sign-up', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
