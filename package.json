@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-  "typescript": "4.9.5",
     "@emotion/react": "11.13.3",
     "@emotion/styled": "11.13.0",
     "@mui/icons-material": "5.16.7",
@@ -29,6 +28,8 @@
     "react-select": "5.8.0",
     "react-toastify": "10.0.5",
     "redux": "5.0.1",
+    "redux-persist": "^6.0.0",
+    "typescript": "4.9.5",
     "web-vitals": "2.1.4",
     "zcatalyst-cli": "1.17.6"
   },

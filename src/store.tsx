@@ -16,6 +16,7 @@ const rootReducer = combineReducers({
 const store = configureStore({
   reducer: rootReducer,
 });
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const persistor = persistStore(store);
 export type RootState = ReturnType<typeof rootReducer>;
