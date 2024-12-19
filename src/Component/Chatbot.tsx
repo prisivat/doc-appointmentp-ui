@@ -179,7 +179,7 @@ const Chatbot = () => {
             toast.error('Error making POST request:');
           }
         }
-        if(userName){
+        if(userName && userName != ""){
             setIsLoading(true);
         bookingHistory();
         }
