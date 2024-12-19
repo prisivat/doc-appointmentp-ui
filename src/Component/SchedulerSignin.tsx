@@ -61,7 +61,7 @@ const SchedulerSignIn: React.FC = () => {
         schedulerName: hospitalName.replace(" ", "") + locationSelected
       }));
       try {
-        const response = await fetch('http://localhost:9000/api/scheduler/save-scheduler', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/api/scheduler/save-scheduler', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -95,15 +95,16 @@ const SchedulerSignIn: React.FC = () => {
   const handleOptVerify = async (e: any) => {
     setIsLoading(true);
     if (otpValue == "") {
+      setIsLoading(false);
       toast.error("Please enter OTP")
     } else {
       var body = { hospitalName: hospitalName, location: locationSelected, otp: otpValue }
       setSchedulerName(hospitalName + locationSelected)
-      dispatch(userDetails({
+      dispatch(schedulerDetails({
         schedulerName: hospitalName + locationSelected
-      }));
+      })); 
       try {
-        const response = await fetch('http://localhost:9000/api/scheduler/verify-otp', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/api/scheduler/verify-otp', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -112,6 +113,7 @@ const SchedulerSignIn: React.FC = () => {
         });
 
         if (!response.ok) {
+          setIsLoading(false);
           const errorMessage = await response.text(); // Use response.json() if server returns JSON
           toast.error(errorMessage);
           if (errorMessage == "OTP has Expired.") {
@@ -120,6 +122,11 @@ const SchedulerSignIn: React.FC = () => {
             setFormData({ ...formData, otp: "" });
           }
         } else {
+          dispatch(schedulerDetails({
+            hospitalName: hospitalName,
+            location: locationSelected
+          }));
+          setIsLoading(false);
           setRegisterScheduler(true)
           setEnterOTP(false)
         }
@@ -127,6 +134,7 @@ const SchedulerSignIn: React.FC = () => {
         // const data = await response.json();
         // console.log(data);
       } catch (error) {
+        setIsLoading(false);
         toast.error('Error making POST request:');
       }
     }
@@ -136,7 +144,7 @@ const SchedulerSignIn: React.FC = () => {
     setEnterOTP(true)
     var data = { "hospitalName": hospitalName, "location": locationSelected }
     try {
-      const response = await fetch('http://localhost:9000/api/scheduler/register-scheduler', {
+      const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/api/scheduler/register-scheduler', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -173,7 +181,7 @@ const SchedulerSignIn: React.FC = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await fetch('http://localhost:9000/hospital/locations', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/hospital/locations', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -192,7 +200,7 @@ const SchedulerSignIn: React.FC = () => {
     var location = locationSelected;
     const fetchFilterValues = async () => {
       try {
-        const response = await fetch(`http://localhost:9000/hospital/filterDtls/${location}`, {
+        const response = await fetch(`https://easymedurl-50022251973.development.catalystappsail.in/hospital/filterDtls/${location}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -218,11 +226,21 @@ const SchedulerSignIn: React.FC = () => {
 
   return (
     <>
+     {isLoading ? <><div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'rgba(255, 255, 255, 0.8)', // Adds a white overlay
+        backdropFilter: 'blur(10px)', // Adjust the blur intensity
+        zIndex: 1,
+      }}></div><Loader /> </> : <div>
       <SchedulerHeader />
       <div className="login-container" >
         <header className="login-header">
           <img style={{ width: "5rem" }} src={logo} alt="logo" />
-          <h1 className="hospital-name">{enterOTP ? "Enter OTP": registerScheduler? "Sign In" : "Log In"}</h1>
+          <h1 className="hospital-name">{enterOTP ? "Enter OTP":  "Sign In" }</h1>
         </header>
         <div className="login-box">
 
@@ -280,10 +298,10 @@ const SchedulerSignIn: React.FC = () => {
 
 
 
-              <Grid sx={{ marginTop: "1rem", display: "flex", alignContent: "center", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
+              <Grid sx={{ marginTop: "1rem", display: "flex", flexDirection: "column", alignContent: "center", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
                 <b>Location:</b>
 
-                <FormControl sx={{ m: 1, minWidth: 120 }}>
+                <FormControl sx={{ m: 1, minWidth: "100%" }}>
                   <Select
                     value={locationSelected}
                     onChange={(e: any) => { setLocationSelected(e.target.value) }}
@@ -305,12 +323,14 @@ const SchedulerSignIn: React.FC = () => {
 
                   <>
 
-                    <Grid sx={{ marginTop: "1rem", display: "flex", alignContent: "center", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}><b>Hospital Name :</b>
+                    <Grid sx={{ marginTop: "1rem", display: "flex",
+                       alignContent: "center", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
+                      <Grid xs={12} sx={{minWidth:"100%", alignContent:"center", display: "flex", justifyContent: "center"}}><b>Hospital Name :</b></Grid>
                       <Autocomplete
                         id="combo-box-demo"
                         options={hospitalNameFilterList}
                         getOptionLabel={(option: any) => option}
-                        sx={{ width: 300, background: "white", marginTop: "1rem", }}
+                        sx={{  minWidth: "190% !important", background: "white", marginTop: "1rem", }}
                         value={hospitalName}
                         onChange={(event, newValue: any) => setHospitalName(newValue)}
                         renderInput={(params) => (
@@ -324,7 +344,7 @@ const SchedulerSignIn: React.FC = () => {
                     </Grid></>
                 )}
 
-                <Button sx={{ background: "#067492 !important", color: "white", marginTop: "1rem" }} onClick={handleRegister} >Create Scheduler</Button>
+                <Button sx={{ background: "#067492 !important", color: "white", marginTop: "1rem", minWidth: "100%" }} onClick={handleRegister} >Create Scheduler</Button>
               </Grid>
 
             </>
@@ -332,8 +352,8 @@ const SchedulerSignIn: React.FC = () => {
 
 
         </div>
-
-      </div>
+</div>
+      </div>}
     </>
   );
 };

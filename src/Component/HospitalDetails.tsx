@@ -83,7 +83,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
       final.specialist = filterValues.specialist
 
       try {
-        const response = await fetch('http://localhost:9000/hospital/filteredDtls', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/hospital/filteredDtls', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -157,7 +157,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
     var location = loc;
     const fetchFilterValues = async () => {
       try {
-        const response = await fetch(`http://localhost:9000/hospital/filterDtls/${location}`, {
+        const response = await fetch(`https://easymedurl-50022251973.development.catalystappsail.in/hospital/filterDtls/${location}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -187,7 +187,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
 
   function handleBookAppointment(docName: any, cost: any, hospitalName: any, location: any, specialist: any): void {
     setIsLoading(true);
-    if (userName == undefined || userName == null) {
+    if (userName == undefined || userName == null || userName == "") {
       toast.error("Please Login to Book Appointment")
       setIsLoading(false);
     } else {
@@ -247,7 +247,7 @@ export const HospitalDetails = ({ hospDtlsByLoc, spltNameList, locationList }: P
                             <Grid xs={6} sx={{ borderLeft: "2px solid black", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                               <div style={{ marginBottom: "5px" }}>Monday to Sunday (09:00 To 20:00) </div>
                               <Button onClick={() => handleContactDetails(hospital.name)} sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Contact Hospital</Button>
-                              <Tooltip title={userName == undefined || userName == null ? "Please Login to Book Appointment" : " Book Appointment"}>
+                              <Tooltip title={userName == undefined || userName == null || userName == "" ? "Please Login to Book Appointment" : " Book Appointment"}>
                                 <Button
                                   onClick={() => handleBookAppointment(docName?.docName, docName?.cost, hospital?.name, city?.location, specalistVal.spclName)}
                                   sx={{ background: "#067492 !important", color: "white", marginBottom: "5px" }} >Book Appointment</Button>

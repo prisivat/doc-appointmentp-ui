@@ -22,6 +22,7 @@ const SchedulerHome: React.FC = () => {
   const location = useSelector((state: RootState) => state.user.location);
   const [selectedDocName, setSelectedDocName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [dateVal, setDateVal] = useState();
 
   const Loader = () => (
     <div style={{
@@ -44,8 +45,8 @@ const SchedulerHome: React.FC = () => {
 
         // const body = {hospitalName: hospitalName, location: location, date: new Date()};
         var date = new Date().toISOString().split('T')[0];;
-        const body = { hospitalName: "Apollo Hospital", location: "Chennai", date: date };
-        const response = await fetch('http://localhost:9000/appointment/scheduler-total-appointments', {
+        const body = { hospitalName: hospitalName, location: location, date: date };
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/appointment/scheduler-total-appointments', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -87,8 +88,8 @@ const SchedulerHome: React.FC = () => {
     setSelectedDocName(selected);
     setScedulerDetails([])
     try {
-      const body = { hospitalName: schedulerDetails[0].hospitalName, location: schedulerDetails[0].location, docName: selected == "" ? "ALL" : selected };
-      const response = await fetch('http://localhost:9000/appointment/scheduler-filter', {
+      const body = { hospitalName: hospitalName, location: location, docName: selected == "" ? "ALL" : selected };
+      const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/appointment/scheduler-filter', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -116,11 +117,12 @@ const SchedulerHome: React.FC = () => {
 
   const handleDateSelect = async (newValue: any) => {
     setIsLoading(true);
+    setDateVal(newValue);
     try {
       const formattedDate = newValue ? dayjs(newValue).format('YYYY-MM-DD') : '';
       setSelectedDocName("")
-      const body = { hospitalName: schedulerDetails[0].hospitalName, location:  schedulerDetails[0].location, date: formattedDate };
-      const response = await fetch('http://localhost:9000/appointment/scheduler-appointments', {
+      const body = { hospitalName: hospitalName, location:  location, date: formattedDate };
+      const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/appointment/scheduler-appointments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -158,6 +160,16 @@ const SchedulerHome: React.FC = () => {
   return (
     <>
       <div style={bodyStyle}>
+      {isLoading ? <><div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'rgba(255, 255, 255, 0.8)', // Adds a white overlay
+        backdropFilter: 'blur(10px)', // Adjust the blur intensity
+        zIndex: 1,
+      }}></div><Loader /> </> : <div>
         <SchedulerHeader />
         <Grid container xs={12} style={{ display: "flex", paddingTop: "100px" }}>
           <Grid item xs={12} sx={{ right: 0, display: "flex", flexDirection: "row", justifyContent: "flex-end", marginRight: "2rem", position: "fixed" }}>
@@ -176,7 +188,7 @@ const SchedulerHome: React.FC = () => {
             </Select>
             <LocalizationProvider dateAdapter={AdapterDayjs} >
               <DemoContainer components={['DatePicker']}>
-                <DatePicker label="Basic date picker" onChange={handleDateSelect} sx={{ background: "white" }} />
+                <DatePicker value={dateVal} label="Basic date picker" onChange={handleDateSelect} sx={{ background: "white" }} />
               </DemoContainer>
             </LocalizationProvider>
           </Grid>
@@ -230,6 +242,7 @@ const SchedulerHome: React.FC = () => {
             </Box>
           </Grid>
         </Grid>
+        </div>}
       </div>
     </>
   )

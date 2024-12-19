@@ -6,6 +6,8 @@ import logo from '../assets/logo.png';
 import Headers from './Header';
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import { useNavigate } from "react-router-dom";
+
 
 
 
@@ -23,6 +25,8 @@ const SignUp = () => {
     const [user, setUser] = useState({ "firstName": "", "lastName": "", "phoneNumber": "", "email": "", "password": "" })
     const userName = useSelector((state: RootState) => state.user.userName);
     const [isLoading, setIsLoading] = useState(false);
+      const navigate = useNavigate();
+    
 
     const Loader = () => (
         <div style={{
@@ -78,7 +82,7 @@ const SignUp = () => {
             toast.error("Please fill all the Fields")
         } else {
             try {
-                const response = await fetch('http://localhost:9000/api/patient/sign-up', {
+                const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/api/patient/sign-up', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -89,10 +93,9 @@ const SignUp = () => {
 
                 if (!response.ok) {
                     var errorMessage = await response.text(); // Use response.json() if server returns JSON
-                    var val = JSON.parse(errorMessage);
-                    errorMessage = val && val.email ? val.email : val.phoneNumber ? val.phoneNumber : errorMessage;
-                    toast.error(errorMessage);
+                     toast.error(errorMessage);
                 } else {
+                    navigate("/login")
                     toast.success("Registered Successfully!!!")
                 }
 
@@ -175,10 +178,7 @@ const SignUp = () => {
                         <Button sx={{ border: "2px solid black", marginLeft: "40%" }} onClick={handleSubmit}>Register</Button>
                     </form>
                 </div>
-                <footer className="login-footer">
-                    <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> | <a href="#">Contact Us</a>
-                </footer>
-                <button className="help-button">Need Help?</button>
+               
             </div>
         </>
     )

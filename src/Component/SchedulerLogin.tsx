@@ -52,7 +52,7 @@ const SchedulerLogin: React.FC = () => {
               schedulerName: hospitalName.replace(" ", "") + locationSelected
             }));
       try {
-        const response = await fetch('http://localhost:9000/api/scheduler/verify-otp', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/api/scheduler/verify-otp', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ const SchedulerLogin: React.FC = () => {
     setIsLoading(true);
     const fetchDetails = async () => {
       try {
-        const response = await fetch('http://localhost:9000/hospital/locations', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/hospital/locations', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ const SchedulerLogin: React.FC = () => {
     var location = locationSelected;
     const fetchFilterValues = async () => {
       try {
-        const response = await fetch(`http://localhost:9000/hospital/filterDtls/${location}`, {
+        const response = await fetch(`https://easymedurl-50022251973.development.catalystappsail.in/hospital/filterDtls/${location}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -153,7 +153,7 @@ const SchedulerLogin: React.FC = () => {
 
     var body = { hospitalName: hospitalName, location: locationSelected, password: schedulerPassword }
     try {
-      const response = await fetch(`http://localhost:9000/api/scheduler/scheduler-login`, {
+      const response = await fetch(`https://easymedurl-50022251973.development.catalystappsail.in/api/scheduler/scheduler-login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ const SchedulerLogin: React.FC = () => {
         const errorMessage = await response.text();
         if (errorMessage == "Scheduler not found") {
           toast.error("Scheduler not found");
-        } else if (errorMessage == "Password is incorrect") {
+        } else if (errorMessage.includes("Password is incorrect")) {
           toast.error("Password is incorrect");
         } else {
           setEnterOTP(true);
@@ -185,8 +185,18 @@ const SchedulerLogin: React.FC = () => {
 
   return (
     <div>
+      {isLoading ? <><div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'rgba(255, 255, 255, 0.8)', // Adds a white overlay
+        backdropFilter: 'blur(10px)', // Adjust the blur intensity
+        zIndex: 1,
+      }}></div><Loader /> </> : <div>
       <SchedulerHeader />
-      <div className="login-container" style={{    width: "200%"}} >
+      <div className="login-container"  >
         <header className="login-header">
           <img style={{ width: "5rem" }} src={logo} alt="logo" />
           <h1 className="hospital-name">{enterOTP ? "Enter OTP":  "Log In"}</h1>
@@ -211,7 +221,7 @@ const SchedulerLogin: React.FC = () => {
           <Grid sx={{ display: "flex", alignItems: "stretch", flexDirection: "column" }}>
             <b>Location:</b>
 
-            <FormControl sx={{ m: 1, minWidth: 120 }}>
+            <FormControl sx={{ m: 1, minWidth: "100%" }}>
               <Select
                 value={locationSelected}
                 onChange={(e: any) => { setLocationSelected(e.target.value) }}
@@ -258,7 +268,7 @@ const SchedulerLogin: React.FC = () => {
                       value={schedulerPassword}
                       onChange={(e) => { setSchedulerPassword(e.target.value) }}
                       required
-                      style={{ background: "white", height: "3rem", marginTop: "5px" }} />
+                      style={{ background: "white", height: "3rem", marginTop: "5px" , width: "100% !important"}} />
                   </div>
                 </Grid></>
             )}
@@ -268,6 +278,7 @@ const SchedulerLogin: React.FC = () => {
         )
         }
       </div>
+      </div>}
     </div>
   )
 }

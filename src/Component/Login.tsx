@@ -58,7 +58,7 @@ const LoginPage: React.FC = () => {
         userName: formData.username
       }));
       try {
-        const response = await fetch('http://localhost:9000/api/patient/login', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/api/patient/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ const LoginPage: React.FC = () => {
         userName: formData.username
       }));
       try {
-        const response = await fetch('http://localhost:9000/api/patient/verify-otp', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/api/patient/verify-otp', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ const LoginPage: React.FC = () => {
   const handleForgotPasswordEmail = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:9000/api/patient/forgot-password', {
+      const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/api/patient/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -191,7 +191,7 @@ const LoginPage: React.FC = () => {
     if (resetPassword.confirmPassword == resetPassword.password) {
       const data = { token: resetPassword.token, newPassword: resetPassword.password }
       try {
-        const response = await fetch('http://localhost:9000/api/patient/reset-password', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/api/patient/reset-password', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -236,7 +236,7 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
     const data = { "email": forgotUserEmail }
     try {
-      const response = await fetch('http://localhost:9000/api/patient/forgot-username', {
+      const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/api/patient/forgot-username', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -428,10 +428,7 @@ const LoginPage: React.FC = () => {
               <Button sx={{ border: "2px solid black", marginLeft: "40%" }} onClick={handleOptVerify}>Verify OTP</Button></div>
           )}
         </div>
-        <footer className="login-footer">
-          <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> | <a href="#">Contact Us</a>
-        </footer>
-        <button className="help-button">Need Help?</button>
+        
       </div>
     </>
   );

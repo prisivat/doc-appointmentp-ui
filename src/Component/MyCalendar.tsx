@@ -72,7 +72,7 @@ const MyCalendar = ({ event }: Props) => {
   const handleCancelAppointment = async (item: any) => {
     try {
       const body = { bookingId: item.bookingId, patientName: item.patientNam };
-      const response = await fetch('http://localhost:9000/appointment/cancel-booking', {
+      const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/appointment/cancel-booking', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

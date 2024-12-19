@@ -54,6 +54,9 @@ const Headers = () => {
   }
 
   const handleScheduler = () => {
+    dispatch(userDetails({
+            userName: ""
+          }));
     navigate("/schedulerLogin")
   }
 

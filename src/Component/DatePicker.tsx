@@ -60,7 +60,7 @@ const DatePicker = ({ setDate, listOfTime }: Props) => {
     if (bookingId != "" && bookingId != undefined) {
       const fetchFilterValues = async () => {
         try {
-          const response = await fetch(`http://localhost:9000/appointment/scheduler-appointments/${bookingId}`, {
+          const response = await fetch(`https://easymedurl-50022251973.development.catalystappsail.in/appointment/scheduler-appointments/${bookingId}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ const DatePicker = ({ setDate, listOfTime }: Props) => {
         "date": selectedDate, "time": selectedTime, "bookingId": bookingId
       }
       try {
-        const response = await fetch('http://localhost:9000/appointment/reschedule-booking', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/appointment/reschedule-booking', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -145,7 +145,7 @@ const DatePicker = ({ setDate, listOfTime }: Props) => {
         "date": selectedDate, "time": selectedTime
       }
       try {
-        const response = await fetch('http://localhost:9000/appointment/booking', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/appointment/booking', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

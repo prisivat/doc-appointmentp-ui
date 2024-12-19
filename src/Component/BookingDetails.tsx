@@ -50,7 +50,7 @@ const BookingDetails = () => {
     setIsLoading(true);
     const body = { location: location, hospitalName: hospName, specialist: specalist, docName: docName, date: selectedDate };
     try {
-      const response = await fetch('http://localhost:9000/appointment/booked/time', {
+      const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/appointment/booked/time', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

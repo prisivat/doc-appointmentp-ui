@@ -27,6 +27,9 @@ const SchedulerHeader = () => {
     navigate("/schedulerLogin")
   }
   const handleUserHome = () => {
+     dispatch(schedulerDetails({
+                  schedulerName: ""
+                }));
     navigate("/")
   }
 
@@ -47,9 +50,9 @@ const SchedulerHeader = () => {
           <b>EasyMed</b>
         </div>
       </Grid>
-      <Grid item xs={7} sx={{ display: "flex", justifyContent: "flex-end" }}>
+      <Grid item xs={5} sx={{ display: "flex", justifyContent: "flex-end" }}>
         <ul className="nav-links">
-          <li><button onClick={handleHome} className="Header-button">Home</button></li>
+          <li><button onClick={handleHome} disabled= {schedulerName == "" || schedulerName == null ? true : false} className="Header-button">Home</button></li>
         </ul>
         <ul className="nav-links">
           <li><button onClick={handleUserHome} className="Header-button">User Home</button></li>
@@ -69,14 +72,14 @@ const SchedulerHeader = () => {
           (
             <>
 
-              <div className="login-btn">
-                <button onClick={handleLogOut}>Log out</button>
+              <div >
+                <button  className="Header-button" onClick={handleLogOut}>Log out</button>
               </div>
 
             </>
           )}
       </Grid>
-      <Grid xs={2} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+      <Grid xs={4} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
         <div style={{ right: 0, display: "flex", alignItems: "center" }}>
           {schedulerName != null && schedulerName != "" ? schedulerName : "Unknown User"}<Avatar sx={{ marginLeft: "10px", marginRight: "10px" }} />
         </div>

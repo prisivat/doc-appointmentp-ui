@@ -1,13 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Chatbot.css';  // Import CSS for styles
 import chatbot from '../assets/chatbot.png';
+import { toast } from 'react-toastify';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store';
+import { useNavigate } from 'react-router-dom';
+import { hospitalDetails } from '../userSlice';
+import Model from './Model';
+
+
 
 const Chatbot = () => {
     const [messages, setMessages] = useState<{ sender: string, message: string }[]>([]);
     const [userInput, setUserInput] = useState('');
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [event, setEvent] = useState<any>("11-11-2024")
+    const userName = useSelector((state: RootState) => state.user.userName);
+    const [localHospitalDetails, setLocalHospitalDetails] = useState([]);
+    const [showButton, setShowButton] = useState(true);
+    const [openModel, setOpenModel] = useState(false);
+    const [appBody, setAppBody] = useState({});
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    
     const Loader = () => (
         <div style={{
           position: 'fixed',
@@ -116,6 +134,109 @@ const Chatbot = () => {
         }
     };
 
+    function getDate(date: any) {
+        const today = new Date();
+        const year = today.getFullYear().toString();
+        let month = (today.getMonth() + 1).toString();
+    
+        if (month.length === 1) {
+          month = "0" + month;
+        }
+    
+        return date.replace("YEAR", year).replace("MONTH", month);
+      }
+
+      
+     useEffect(() => {
+        var val = getDate("YEAR-MONTH-24")
+        console.log(val, "val")
+        setEvent([{ title: "AZUL +5", start: val }])
+        const bookingHistory = async () => {
+          try {
+            const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/appointment/booking-history', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: (userName),
+            });
+    
+            if (!response.ok) {
+              setIsLoading(false);
+              const errorMessage = await response.text(); // Use response.json() if server returns JSON
+              toast.error(errorMessage);
+            } else {
+              setIsLoading(false);
+              var val = await response.json()
+              console.log(val, "History")
+              setLocalHospitalDetails(val)
+            }
+    
+            // const data = await response.json();
+            // console.log(data);
+          } catch (error) {
+            setIsLoading(false);
+            toast.error('Error making POST request:');
+          }
+        }
+        if(userName){
+            setIsLoading(true);
+        bookingHistory();
+        }
+      }, [])
+
+    const handleRescheduler = (item: any) => {
+       dispatch(hospitalDetails({
+         docName: item.docName,
+         cost: item.cost,
+         hospitalName: item.hospitalName,
+         location: item.location,
+         specialist: item.specialist,
+         bookingId: item.bookingId
+       }));
+       navigate("/bookAppointment")
+     }
+   
+     const handleCancelAppointment = async (item: any) => {
+       try {
+         const body = { bookingId: item.bookingId, patientName: item.patientNam };
+         const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/appointment/cancel-booking', {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json',
+           },
+           body: JSON.stringify(body),
+         });
+   
+         if (!response.ok) {
+           setIsLoading(false);
+           const errorMessage = await response.text(); // Use response.json() if server returns JSON
+           toast.error(errorMessage);
+   
+         } else {
+           setIsLoading(false);
+           toast.success("Appointment cancelled successfully!")
+           navigate("/home")
+         }
+   
+       } catch (error) {
+         setIsLoading(false);
+         toast.error('Error making POST request:');
+       }
+   
+     }
+
+    const handleSelectEvent = (item: any) => {
+        setOpenModel(true)
+        const val = <div><b>Appointment Detail of  {item.patientName}</b><br/>Doctor Name: {item.docName}<br /> Patient Gender: {item.gender}
+          <br /> Hospital Name: {item.hospitalName} <br /> Location: {item.location} <br /> Phone Number: {item.phoneNumber} <br /> Specialist: {item.specialist}<br />
+          <button style={{ padding: "5px", border: "2px #0799c1 solid", borderRadius: "5px", marginRight: "1rem" }} onClick={() => handleRescheduler(item)}>Reschedule Appointment</button>
+          <button style={{ padding: "5px", border: "2px #0799c1 solid", borderRadius: "5px" }} onClick={() => handleCancelAppointment(item)}>Cancel Appointment</button></div>
+        setAppBody(val)
+        // alert(`${item.title}\nage : ${item.age}\nDoctor Name: ${item.docName}\nPatient Gender : ${item.gender}\nHospital Name : ${item.hospitalName}\nLocation : ${item.location}\n
+        //   Phone Number : ${item.phoneNumber}\nSpecialist : ${item.specialist}`);
+      };
+
     return (
         <div>
             {isLoading ? <><div style={{
@@ -132,6 +253,9 @@ const Chatbot = () => {
             <div className="chat-icon" onClick={toggleChatWindow}>
                 <img src={chatbot} alt="Chat Icon" />
             </div>
+            {openModel && (
+        <Model title={"Appointment Details"} opeModel={openModel} setOpeModel={setOpenModel} isHospDtls={false} body={appBody} iscalendar={true} />
+      )}
 
             {/* Chat window */}
             {isChatOpen && (
@@ -148,6 +272,20 @@ const Chatbot = () => {
                             </div>
                         ))}
                     </div>
+                    {showButton && localHospitalDetails.length != 0 && (
+                        <>
+                        <div>Upcoming Appointment: </div>
+                        {localHospitalDetails.length != 0 && localHospitalDetails?.map((val:any) => (
+                            <>
+                            
+                            <button style={{background: "white", border: "2px solid black", borderRadius: "2px", margin: "0.5rem"}} onClick={() => {handleSelectEvent(val)}}>Booking ID:  {val.bookingId}</button>
+                            </>
+                        ))
+                    }
+                    </>
+                    )}
+                    
+                
                     <div className="chat-input">
                         <input
                             type="text"

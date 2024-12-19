@@ -41,7 +41,7 @@ const ResetPassword = () => {
             setIsLoading(false);
             var body = { token: user.token, password: user.password }
             try {
-                const response = await fetch('http://localhost:9000/api/patient/reset-password', {
+                const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/api/patient/reset-password', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

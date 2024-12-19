@@ -51,13 +51,12 @@ function BookingHistory() {
 
 
   useEffect(() => {
-    setIsLoading(true);
     var val = getDate("YEAR-MONTH-24")
     console.log(val, "val")
     setEvent([{ title: "AZUL +5", start: val }])
     const bookingHistory = async () => {
       try {
-        const response = await fetch('http://localhost:9000/appointment/booking-history', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/appointment/booking-history', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -83,7 +82,10 @@ function BookingHistory() {
         toast.error('Error making POST request:');
       }
     }
+    if(userName){
+      setIsLoading(true);
     bookingHistory();
+    }
   }, [])
   return (
     <>
