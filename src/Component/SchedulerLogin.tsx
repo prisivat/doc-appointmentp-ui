@@ -6,7 +6,7 @@ import SchedulerHeader from './SchedulerHeader';
 import { hospitalDetails } from '../userSlice';
 import { useDispatch } from 'react-redux';
 import logo from "../assets/logo.png"
-import userSlice, { schedulerDetails, userDetails } from "../userSlice"
+import userSlice, { schedulerDetails, } from "../userSlice"
 
 
 

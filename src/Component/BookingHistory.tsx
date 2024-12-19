@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-// import FullCalendar from '@fullcalendar/react';
-// import dayGridPlugin from "@fullcalendar/daygrid";
-// import timeGridPlugin from "@fullcalendar/timegrid";
-
-// import "@fullcalendar/core/main.css";
-// import "@fullcalendar/daygrid/main.css";
-// import "@fullcalendar/timegrid/main.css";
 import MyCalendar from './MyCalendar';
 
 import Headers from './Header';

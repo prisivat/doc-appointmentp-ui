@@ -3,13 +3,10 @@ import './login.css'; // Importing the CSS file
 import logo from "../assets/logo.png"
 import { Autocomplete, Button, FormControl, Grid, MenuItem, Select, TextField } from '@mui/material';
 import { toast } from 'react-toastify';
-import Headers from './Header';
 import { useSelector, useDispatch } from 'react-redux';
 import userSlice, { schedulerDetails, userDetails } from "../userSlice"
-import { useAppSelector } from '../reduxHooks';
 import { useNavigate } from "react-router-dom";
 import SchedulerHeader from './SchedulerHeader';
-import { Password } from '@mui/icons-material';
 
 
 // Define the state interface for the form

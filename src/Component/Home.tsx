@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './login.css';
-import { Autocomplete, Button, Grid, TextField } from '@mui/material';
 import { toast } from 'react-toastify';
 import Headers from './Header'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { HospitalDetails } from './HospitalDetails';

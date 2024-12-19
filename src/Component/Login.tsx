@@ -6,7 +6,6 @@ import { toast } from 'react-toastify';
 import Headers from './Header';
 import { useSelector, useDispatch } from 'react-redux';
 import userSlice, { userDetails } from "../userSlice"
-import { useAppSelector } from '../reduxHooks';
 import { useNavigate } from "react-router-dom";
 
 
