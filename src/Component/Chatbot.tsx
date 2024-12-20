@@ -45,115 +45,120 @@ const Chatbot = () => {
     setUserInput(e.target.value);
   };
 
+  const checkMatch = (text:any, words:any) => {
+    const wordArray = words.split(" ");
+    return wordArray.some((word:any) => new RegExp(`\\b${word}\\b`, 'i').test(text));
+  };
+
   // Hardcoded greetings and responses
   const getGreetingResponse = (input: string) => {
     const greetings = ['hi', 'hello', 'hey',];
     const end = ['thanks', 'thank you'];
     const userMessage = input.toLowerCase().trim();
     setIsLoading(true)
-    if (greetings.includes(userMessage)) {
+    if (checkMatch(greetings,userMessage)) {
       return "Hi, how can I help you?";
-    } else if (end.includes(userMessage)) {
+    } else if (checkMatch(end,userMessage)) {
       return "Welcome!";
-    } else if ("good morning".includes(userMessage)) {
+    } else if (checkMatch("good morning",userMessage)) {
       return "Good morning! How can I assist you?";
-    } else if ("good morning".includes(userMessage)) {
+    } else if (checkMatch("good morning",userMessage)) {
       return "Good morning! How can I assist you?";
-    } else if ("good evening".includes(userMessage)) {
+    } else if (checkMatch("good evening",userMessage)) {
       return "Good Evening! How can I assist you?";
-    } else if ("goodbye".includes(userMessage)) {
+    } else if (checkMatch("goodbye",userMessage)) {
       return "Goodbye! Have a great day!";
-    } else if ("see you later".includes(userMessage)) {
+    } else if (checkMatch("see you later",userMessage)) {
       return "Take care! See you next time.";
-    } else if ("i'm having high temperature and tiredness".includes(userMessage)) {
+    } else if (checkMatch("high temperature and tiredness",userMessage)) {
       return "you may have Fever.";
-    } else if ("i'm having a sore throat and cough".includes(userMessage)) {
+    } else if (checkMatch("sore throat and cough",userMessage)) {
       return "you may have a Common Cold.";
     }
-    else if ("i'm experiencing chest pain and shortness of breath".includes(userMessage)) {
+    else if (checkMatch("chest pain and shortness of breath",userMessage)) {
       return "you may have a Heart-related issue. Please consult a doctor immediately.";
     }
-    else if ("i'm feeling nauseous and have stomach pain".includes(userMessage)) {
+    else if (checkMatch("nauseous and stomach pain",userMessage)) {
       return "you may have a Stomach Infection.";
     }
-    else if ("i'm having a headache and sensitivity to light".includes(userMessage)) {
+    else if (checkMatch(" headache and sensitivity to light",userMessage)) {
       return "you may have a Migraine.";
     }
-    else if ("i'm feeling a lump in my throat and difficulty swallowing".includes(userMessage)) {
+    else if (checkMatch("i'm feeling a lump in my throat and difficulty swallowing",userMessage)) {
       return "you may have a Throat Infection.";
     }
-    else if ("i'm having skin rashes and itching".includes(userMessage)) {
+    else if (checkMatch("i'm having skin rashes and itching",userMessage)) {
       return "you may have an Allergic Reaction.";
     }
-    else if ("i'm experiencing joint pain and swelling".includes(userMessage)) {
+    else if (checkMatch("i'm experiencing joint pain and swelling",userMessage)) {
       return "you may have Arthritis.";
     }
-    else if ("i'm feeling extremely thirsty and urinating frequently".includes(userMessage)) {
+    else if (checkMatch("i'm feeling extremely thirsty and urinating frequently",userMessage)) {
       return "you may have Diabetes Symptoms.";
     }
-    else if ("i'm feeling dizzy and fainting frequently".includes(userMessage)) {
+    else if (checkMatch("i'm feeling dizzy and fainting frequently",userMessage)) {
       return "you may have Low Blood Pressure.";
     }
-    else if ("i'm experiencing severe back pain and leg numbness".includes(userMessage)) {
+    else if (checkMatch("i'm experiencing severe back pain and leg numbness",userMessage)) {
       return "you may have a Spine or Nerve issue.";
-    } else if ("i'm having sneezing and runny nose".includes(userMessage)) {
+    } else if (checkMatch("i'm having sneezing and runny nose",userMessage)) {
       return "you may have Allergic Rhinitis or a Common Cold.";
     }
-    else if ("i'm experiencing severe abdominal pain and diarrhea".includes(userMessage)) {
+    else if (checkMatch("i'm experiencing severe abdominal pain and diarrhea",userMessage)) {
       return "you may have Food Poisoning or Gastroenteritis.";
     }
-    else if ("i'm having a pounding headache and nausea".includes(userMessage)) {
+    else if (checkMatch(" pounding headache and nausea",userMessage)) {
       return "you may have a Migraine or Dehydration.";
     }
-    else if ("i'm feeling a burning sensation while urinating".includes(userMessage)) {
+    else if (checkMatch("i'm feeling a burning sensation while urinating",userMessage)) {
       return "you may have a Urinary Tract Infection (UTI).";
     }
-    else if ("i'm feeling shortness of breath and wheezing".includes(userMessage)) {
+    else if (checkMatch("i'm feeling shortness of breath and wheezing",userMessage)) {
       return "you may have Asthma or a Respiratory Issue.";
     }
-    else if ("i'm having blurry vision and feeling tired".includes(userMessage)) {
+    else if (checkMatch("i'm having blurry vision and feeling tired",userMessage)) {
       return "you may have Diabetes or an Eye-related issue.";
     }
-    else if ("i'm feeling extreme fatigue and loss of appetite".includes(userMessage)) {
+    else if (checkMatch("i'm feeling extreme fatigue and loss of appetite",userMessage)) {
       return "you may have Anemia or another underlying condition.";
     }
-    else if ("i'm experiencing swelling in my feet and difficulty breathing".includes(userMessage)) {
+    else if (checkMatch("i'm experiencing swelling in my feet and difficulty breathing",userMessage)) {
       return "you may have a Heart or Kidney Issue.";
     }
-    else if ("i'm feeling dizziness and frequent headaches".includes(userMessage)) {
+    else if (checkMatch("i'm feeling dizziness and frequent headaches",userMessage)) {
       return "you may have High Blood Pressure or Vertigo.";
     }
-    else if ("i'm having dry eyes and sensitivity to light".includes(userMessage)) {
+    else if (checkMatch("i'm having dry eyes and sensitivity to light",userMessage)) {
       return "you may have Dry Eye Syndrome or an Eye Infection.";
     }
-    else if ("i'm experiencing a persistent dry cough and fatigue".includes(userMessage)) {
+    else if (checkMatch("i'm experiencing a persistent dry cough and fatigue",userMessage)) {
       return "you may have Bronchitis or a Respiratory Infection.";
     }
-    else if ("i'm having persistent pain in my joints".includes(userMessage)) {
+    else if (checkMatch("i'm having persistent pain in my joints",userMessage)) {
       return "you may have Rheumatoid Arthritis or a Joint-related issue.";
     }
-    else if ("i'm feeling itchy red patches on my skin".includes(userMessage)) {
+    else if (checkMatch("i'm feeling itchy red patches on my skin",userMessage)) {
       return "you may have Eczema or Psoriasis.";
     }
-    else if ("i'm having a fever and a red rash on my body".includes(userMessage)) {
+    else if (checkMatch(" fever and a red rash on my body",userMessage)) {
       return "you may have Measles or another Viral Infection.";
     }
-    else if ("i'm feeling sudden chest tightness and anxiety".includes(userMessage)) {
+    else if (checkMatch("i'm feeling sudden chest tightness and anxiety",userMessage)) {
       return "you may have Panic Attack symptoms or a Heart-related issue. Seek immediate medical attention if severe.";
     }
-    else if ("i'm experiencing hair loss and brittle nails".includes(userMessage)) {
+    else if (checkMatch("i'm experiencing hair loss and brittle nails",userMessage)) {
       return "you may have a Nutritional Deficiency or Thyroid Problem.";
     }
-    else if ("i'm having frequent nosebleeds and bruising".includes(userMessage)) {
+    else if (checkMatch("i'm having frequent nosebleeds and bruising",userMessage)) {
       return "you may have a Blood Disorder or Vitamin Deficiency.";
     }
-    else if ("i'm experiencing frequent vomiting and abdominal cramps".includes(userMessage)) {
+    else if (checkMatch("i'm experiencing frequent vomiting and abdominal cramps",userMessage)) {
       return "you may have a Stomach Ulcer or Gastrointestinal Problem.";
     }
-    else if ("i'm feeling numbness in my arms and legs".includes(userMessage)) {
+    else if (checkMatch("i'm feeling numbness in my arms and legs",userMessage)) {
       return "you may have a Nerve-related issue or a Vitamin Deficiency.";
     }
-    else if ("i'm having a fever and swollen lymph nodes".includes(userMessage)) {
+    else if (checkMatch(" fever and swollen lymph nodes",userMessage)) {
       return "you may have an Infection, such as Mononucleosis.";
     }
 

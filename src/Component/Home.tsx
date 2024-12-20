@@ -54,7 +54,7 @@ const Home: React.FC = () => {
     setIsLoading(true);
     const fetchDetails = async () => {
       try {
-        const response = await fetch('http://localhost:9000/hospital/locations', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/hospital/locations', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ const Home: React.FC = () => {
     setIsLoading(true);
     const fetchHospitalDtls = async () => {
       try {
-        const response = await axios.get('http://localhost:9000/hospital/hospitalDetails', {
+        const response = await axios.get('https://easymedurl-50022251973.development.catalystappsail.in/hospital/hospitalDetails', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ const Home: React.FC = () => {
       setIsLoading(false);
     } else {
       try {
-        const response = await fetch('http://localhost:9000/hospital/hospitalDetails', {
+        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/hospital/hospitalDetails', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
