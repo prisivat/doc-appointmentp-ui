@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { HospitalDetails } from './HospitalDetails';
 import Chatbot from './Chatbot';
+import axios from 'axios';
 const Home: React.FC = () => {
 
   const containerStyle = {
@@ -53,7 +54,7 @@ const Home: React.FC = () => {
     setIsLoading(true);
     const fetchDetails = async () => {
       try {
-        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/hospital/locations', {
+        const response = await fetch('http://localhost:9000/hospital/locations', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -79,19 +80,19 @@ const Home: React.FC = () => {
     setIsLoading(true);
     const fetchHospitalDtls = async () => {
       try {
-        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/hospital/hospitalDetails', {
+        const response = await axios.get('http://localhost:9000/hospital/hospitalDetails', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
         });
 
-        if (!response.ok) {
+        if (!response.data) {
           setIsLoading(false);
-          const errorMessage = await response.text(); // Use response.json() if server returns JSON
+          const errorMessage = await response.data; // Use response.json() if server returns JSON
           toast.error(errorMessage);
         }
-        const value = await response.json()
+        const value = await response.data
         setHospDtlsByLoc(value);
         setIsLoading(false);
 
@@ -110,7 +111,7 @@ const Home: React.FC = () => {
       setIsLoading(false);
     } else {
       try {
-        const response = await fetch('https://easymedurl-50022251973.development.catalystappsail.in/hospital/hospitalDetails', {
+        const response = await fetch('http://localhost:9000/hospital/hospitalDetails', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
